@@ -27,14 +27,14 @@ This project will be implemented with the following technologies:
 * Canvas API
 
 ## Implementation Timeline
-* Friday Afternoon & Weekend
+* Friday Afternoon & Weekend __
 Making character, one enemy and background to appear. Making player character capable of moving when keystroke is pressed.
-* Monday
+* Monday __
 Complete player character attacking animations. Make attacks capable of "hitting" enemy character. Allow points to be accumulated after eliminating enemy.
-* Tuesday
+* Tuesday __
 Complete enemy character animations and enemy A.I. 
-* Wednesday
+* Wednesday __
 Complete UI and additional features.
-* Thursday Morning
+* Thursday Morning __
 Polish.
 
