@@ -24,7 +24,8 @@ export default class Player {
         this.frameY = 0;
         this.speed = 8;
         this.y_velocity = 0;
-        
+        this.direction = "right";
+
         this.playerSprite = new Image();
         this.playerSprite.src = playerRight;
         
@@ -37,7 +38,7 @@ export default class Player {
         this.atkFrames = [[5,2], [0,3], [1,3], [2,3], [3,3], [4,3], [5,3]];
         this.atkFramesIdx = 0;
 
-        this.healthBar = new HealthBar(20,20,130,30,100,"green");
+        this.healthBar = new HealthBar(20,20,130,10,100,"green");
 
         this.keys = [];
     }
@@ -76,12 +77,14 @@ export default class Player {
     move() {
         if (this.keys["KeyD"]) {// right
             this.playerSprite.src = playerRight;
+            this.direction = "right";
             this.moving = true;
             this.x += this.speed;
             this.frameY = 1;
         }
         if (this.keys["KeyA"]) { // left
             this.playerSprite.src = playerLeft;
+            this.direction = "left";
             this.moving = true;
             this.x -= this.speed
             this.frameY = 1
@@ -94,6 +97,7 @@ export default class Player {
     }
     
     attack() {
+        // if (this.keys["ArrowLeft"] && !this.attackArr.length === 5) 
         if (this.keys["ArrowLeft"]) {
             this.attacking = true;
             this.frameY = 3;
@@ -108,12 +112,19 @@ export default class Player {
 
     dodgeRoll() {
         if (this.keys["ArrowRight"] && this.playerSprite.src === playerRight) {
+            for (let i = 0; i < 10; i++) {
+                this.keys["ArrowRight"];
+            }
+            // console.log()
+            this.dodging = true
             this.frameY = 10;
-            // this.action = true
             this.x += 10;
         }
         if (this.keys["ArrowRight"] && this.playerSprite.src === playerLeft) {
-            // this.action = true
+            for (let i = 0; i < 10; i++) {
+                this.keys.push("ArrowRight");
+            }
+            this.dodging = true
             this.frameY = 10;
             this.x -= 10;
         }
@@ -158,5 +169,4 @@ export default class Player {
     coordinates() {
         return [this.x, this.y];
     }
-
 }

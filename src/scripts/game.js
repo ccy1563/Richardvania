@@ -1,6 +1,7 @@
 import Player from "../scripts/player.js";
 import Level from "../scripts/level.js";
 import Demon from "../scripts/demon.js";
+import Utility from "../scripts/utility.js";
 
 export default class Game {
     constructor(canvas) {
@@ -18,6 +19,8 @@ export default class Game {
         this.elapsed = 0;
         this.startAnimation(15);
         this.eventListener();
+
+        this.timeID = 0;
     }
 
     restart() {
@@ -36,7 +39,6 @@ export default class Game {
         });
     }
     
-    
     animate() {
         requestAnimationFrame(this.animate.bind(this));
         this.now = Date.now();
@@ -48,20 +50,21 @@ export default class Game {
             this.level.animate(this.ctx, this.canvas);
             this.player.animate(this.ctx);
             this.demon.animate(this.ctx, this.player.coordinates());
-            this.collision();
-        }
-    }
-
-    collision() {
-        if (this.player.x > this.demon.x + this.demon.width || 
-            this.player.x + this.player.width < this.demon.x || 
-            this.player.y > this.demon.y + this.demon.height ||
-            this.player.y + this.player.height < this.demon.y) {
-                // no collision
-                // console.log("no collision");
-            } else {
-                // console.log("collision");
+            // this.collision(this.player, this.demon);
+            // console.log(this.collision(this.player, this.demon))
+            if (this.collision(this.player, this.demon)) {
+                this.demon.attack();
             }
+
+            if ((this.player.attacking && this.player.direction === "right" && this.demon.x > this.player.x) || ( this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
+                this.demon.healthBar.takeDamage(75);
+                this.demon.beingAttacked();
+                if (this.demon.healthPoints < 0) {
+                    // this.demon.dead();
+                    console.log("dead");
+                }
+            }
+        }
     }
 
     startAnimation(fps) {
@@ -69,5 +72,22 @@ export default class Game {
         this.then = Date.now();
         this.startTime = this.then;
         this.animate();
+    }
+
+    collision(player, demon) {
+        if (player.x > demon.x + demon.width ||
+            player.x + player.width < demon.x ||
+            player.y > demon.y + demon.height ||
+            player.y + player.height < demon.y) {
+            // no collision
+            // console.log("no collision");
+            return false;
+        } else {
+            // console.log("collision");
+            // enemy character should attack player character 
+            // make sure to (throttle?) so that it isnt spamming the shit out of attack
+            // maybe setInverval? fk me idk
+            return true;
+        }
     }
 }

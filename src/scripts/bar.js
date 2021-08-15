@@ -17,4 +17,12 @@ export default class HealthBar {
         context.fillRect(this.x, this.y, this.w, this.h);
         context.strokeRect(this.x, this.y, this.maxWidth, this.h);
     }
+
+    takeDamage(damagePerHit) {
+        if (this.w - damagePerHit < 0) {
+            this.w = 0;
+        } else {
+            this.w -= damagePerHit;
+        }
+    }
 }
