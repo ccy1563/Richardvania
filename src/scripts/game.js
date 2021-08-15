@@ -1,5 +1,6 @@
 import Player from "../scripts/player.js";
 import Level from "../scripts/level.js";
+import Demon from "../scripts/demon.js";
 
 export default class Game {
     constructor(canvas) {
@@ -8,6 +9,7 @@ export default class Game {
         this.dimensions = { width: canvas.width, height: canvas.height };
         this.level = new Level(this.dimensions);
         this.player = new Player();
+        this.demon = new Demon();
         this.fpsInterval = 0;
         this.then = 0;
         this.startTime = 0;
@@ -15,7 +17,7 @@ export default class Game {
         this.then = 0;
         this.elapsed = 0;
         this.startAnimation(15);
-        this.listener();
+        this.eventListener();
     }
 
     restart() {
@@ -24,7 +26,7 @@ export default class Game {
         this.startAnimation(10);
     }
 
-    listener() {
+    eventListener() {
         const that = this;
         window.addEventListener("keyup", function(e) {
             that.player.keyUp(e);
@@ -44,6 +46,7 @@ export default class Game {
             this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
             this.level.animate(this.ctx, this.canvas);
             this.player.animate(this.ctx);
+            this.demon.animate(this.ctx, this.player.coordinates());
         }
     }
 
