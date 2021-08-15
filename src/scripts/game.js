@@ -35,19 +35,33 @@ export default class Game {
             that.player.keyDown(e);
         });
     }
-
+    
+    
     animate() {
         requestAnimationFrame(this.animate.bind(this));
         this.now = Date.now();
         this.elapsed = this.now - this.then;
-
+        
         if (this.elapsed > this.fpsInterval) {
             this.then = this.now - (this.elapsed % this.fpsInterval);
             this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
             this.level.animate(this.ctx, this.canvas);
             this.player.animate(this.ctx);
             this.demon.animate(this.ctx, this.player.coordinates());
+            this.collision();
         }
+    }
+
+    collision() {
+        if (this.player.x > this.demon.x + this.demon.width || 
+            this.player.x + this.player.width < this.demon.x || 
+            this.player.y > this.demon.y + this.demon.height ||
+            this.player.y + this.player.height < this.demon.y) {
+                // no collision
+                // console.log("no collision");
+            } else {
+                // console.log("collision");
+            }
     }
 
     startAnimation(fps) {

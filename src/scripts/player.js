@@ -1,5 +1,6 @@
 import playerRight from "../assets/HeroRight.png"
 import playerLeft from "../assets/HeroLeft.png"
+import HealthBar from "../scripts/bar.js"
 
 // import playerAttackLeft from "../assets/hero/left/attack.png"
 // import playerBlockLeft from "../assets/hero/left/block.png"
@@ -36,6 +37,8 @@ export default class Player {
         this.atkFrames = [[5,2], [0,3], [1,3], [2,3], [3,3], [4,3], [5,3]];
         this.atkFramesIdx = 0;
 
+        this.healthBar = new HealthBar(20,20,130,30,100,"green");
+
         this.keys = [];
     }
 
@@ -50,6 +53,7 @@ export default class Player {
         this.attack();
         this.dodgeRoll();
         this.handleFrames();
+        this.healthBar.show(ctx);
         // this.fall();
         // this.handleAttackFrame();
     }

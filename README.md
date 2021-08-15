@@ -30,12 +30,12 @@ This project will be implemented with the following technologies:
 Friday Afternoon & Weekend
 * Making character, one enemy and background to appear.
 * Making player character capable of moving when keystroke is pressed.
-Monday
+Monday <br />
 * Complete player character attacking animations. Make attacks capable of "hitting" enemy character. Allow points to be accumulated after eliminating enemy.
-Tuesday
+Tuesday <br />
 * Complete enemy character animations and enemy A.I. 
-Wednesday
+Wednesday <br />
 * Complete UI and additional features.
-Thursday Morning
+Thursday Morning <br />
 * Polish.
 
