@@ -1,7 +1,7 @@
 import Player from "../scripts/player.js";
 import Level from "../scripts/level.js";
 import Demon from "../scripts/demon.js";
-import Utility from "../scripts/utility.js";
+// import Utility from "../scripts/utility.js";
 
 export default class Game {
     constructor(canvas) {
@@ -48,22 +48,11 @@ export default class Game {
             this.then = this.now - (this.elapsed % this.fpsInterval);
             this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
             this.level.animate(this.ctx, this.canvas);
-            this.player.animate(this.ctx);
-            this.demon.animate(this.ctx, this.player.coordinates());
-            // this.collision(this.player, this.demon);
-            // console.log(this.collision(this.player, this.demon))
-            if (this.collision(this.player, this.demon)) {
-                this.demon.attack();
+            if (this.demon.alive) {
+                this.player.animate(this.ctx);
+                this.demon.animate(this.ctx, this.player.coordinates());
             }
-
-            if ((this.player.attacking && this.player.direction === "right" && this.demon.x > this.player.x) || ( this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
-                this.demon.healthBar.takeDamage(75);
-                this.demon.beingAttacked();
-                if (this.demon.healthPoints < 0) {
-                    // this.demon.dead();
-                    console.log("dead");
-                }
-            }
+            this.registerAttacks();
         }
     }
 
@@ -80,14 +69,30 @@ export default class Game {
             player.y > demon.y + demon.height ||
             player.y + player.height < demon.y) {
             // no collision
-            // console.log("no collision");
+            console.log("no collision");
             return false;
         } else {
-            // console.log("collision");
+            console.log("collision");
             // enemy character should attack player character 
             // make sure to (throttle?) so that it isnt spamming the shit out of attack
             // maybe setInverval? fk me idk
             return true;
+        }
+    }
+
+    registerAttacks() {
+        if (this.collision(this.player, this.demon)) {
+            // demon attacking player all the time, wtf how to make it stop
+            this.demon.attack();
+            // player attacking demon
+            if ((this.player.attacking && this.player.direction === "right" && this.demon.x > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
+                this.demon.healthBar.takeDamage(75);
+                this.demon.beingAttacked();
+                if (this.demon.healthPoints < 0) {
+                    console.log("dead");
+                    this.demon.dead();
+                }
+            }
         }
     }
 }

@@ -11,57 +11,53 @@ export default class Demon {
         this.frameX = 0;
         this.frameY = 0;
         this.speed = 3;
+
         this.attacking = false;
         this.moving = true;
+        this.dying = false;
 
         this.alive = true;
         this.healthPoints = 100;
         this.healthBar = new HealthBar(20, 480, 750, 10, 100, "red");
 
-        this.direction = "left";
-
         this.playerSprite= new Image();
         this.playerSprite.src = playerLeft;
-
+        
+        this.direction = "left";
+        this.frameIdx = 0;
         this.movementFramesL = [[0, 3], [1, 3], [2, 3], [3, 3]];
         this.movementFramesR = [[5, 3], [4, 3], [3, 3], [2, 3]];
-        this.movementIdx = 0;
-
         this.attackFramesL = [[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]];
         this.attackFramesR = [[1, 2], [2, 2], [3, 2], [4, 2], [5, 2]];
-        this.attackIdx = 0;
-        this.canAttack = true;
-        
-        this.dyingFramesL = [];
-        this.dyingFramesR = [];
-        this.dyingIdx = 0;
-
-        this.keys = [];
+        this.dyingFramesL = [[5, 6], [4, 6], [3, 6], [2, 6], [1, 6], [0, 6]];
+        this.dyingFramesR = [[6, 0], [6, 1], [6, 2], [6, 3], [6, 4], [6, 5]];
         
         this.now = 0;
         this.then = 0;
         this.elapsed = 0;
-        this.attackAnimationLength = 2200; // Animation length in milliseconds
-        this.dyingAnimationLength = 2000;
+        this.attackAnimationLength = 2200;
+        this.dyingAnimationLength = 5000;
+
+        this.keys = [];
     }
 
     animate(ctx, coordinates) {
         function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
             ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
         }
-
         drawSprite(this.playerSprite, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width * 1.5, this.height * 1.5);
-        
         this.move(coordinates);
-        // this.skills();
-
         this.healthBar.show(ctx);
 
-        this.handleMovementFrame();
-
+        if (this.direction === "right") {
+            this.handleFrames(this.moving, this.movementFramesR, this.frameIdx);
+        } else {
+            this.handleFrames(this.moving, this.movementFramesL, this.frameIdx);
+        }
         this.handleAttackingAnimation();
-
-        // this.dead();
+        if (this.dying === true) {
+            this.handleDyingAnimation();
+        }
     }
 
     move(coordinates) {
@@ -75,9 +71,8 @@ export default class Demon {
                 this.playerSprite.src = playerLeft;
                 this.moving = true;
                 this.x -= this.speed
-                // this.frameY = 1
             }
-            if (this.x < coordinates[0]) {// right
+            if (this.x < coordinates[0]) { // right
                 if (this.direction !== "right") {
                     this.direction = "right";
                     // need this to make frames match when switching directions
@@ -86,37 +81,18 @@ export default class Demon {
                 this.playerSprite.src = playerRight;
                 this.moving = true;
                 this.x += this.speed;
-                // this.frameY = 1;
             }
         }
     }
 
-    attack() {
-        // console.log("attacking");
-        this.attacking = true;
-        this.moving = false;
-    }
-
-    handleMovementFrame() {
-        if (this.moving === true) {
-            if (this.direction === "right") {
-                if (this.movementIdx < this.movementFramesR.length) {
-                    // console.log(this.movementIdx);
-                    this.frameX = this.movementFramesR[this.movementIdx][0];
-                    this.frameY = this.movementFramesR[this.movementIdx][1];
-                    this.movementIdx++;
-                } else {
-                    this.movementIdx = 0;
-                }
+    handleFrames(action, framesArr, frameIdx) {
+        if (action === true) {
+            if (frameIdx < framesArr.length) {
+                this.frameX = framesArr[frameIdx][0];
+                this.frameY = framesArr[frameIdx][1];
+                this.frameIdx++;
             } else {
-                if (this.movementIdx < this.movementFramesL.length) {
-                    // console.log(this.movementIdx);
-                    this.frameX = this.movementFramesL[this.movementIdx][0];
-                    this.frameY = this.movementFramesL[this.movementIdx][1];
-                    this.movementIdx++;
-                } else {    
-                    this.movementIdx = 0;
-                }
+                this.frameIdx = 0;
             }
         }
     }
@@ -126,7 +102,11 @@ export default class Demon {
             this.now = Date.now();
             this.elapsed = this.now - this.then;
             if (this.elapsed < this.now + this.attackAnimationLength) {
-                this.handleAttackingFrame();
+                if (this.direction === "right") {
+                    this.handleFrames(this.attacking, this.attackFramesR, this.frameIdx);
+                } else {
+                    this.handleFrames(this.attacking, this.attackFramesR, this.frameIdx);
+                }
             }
             //might need to put this in a condition after timeout
             this.attacking = false;
@@ -134,28 +114,9 @@ export default class Demon {
         }
     }
 
-    handleAttackingFrame() {
-        // console.log("inside handle attacking frames")
-        if (this.attacking === true) {
-            if (this.direction === "right") {
-                if (this.attackIdx < this.attackFramesR.length) {
-                    // console.log(this.attackIdx)
-                    this.frameX = this.attackFramesR[this.attackIdx][0];
-                    this.frameY = this.attackFramesR[this.attackIdx][1];
-                    this.attackIdx++;
-                } else {
-                    this.attackIdx = 0;
-                }
-            } else {
-                if (this.attackIdx < this.attackFramesL.length) {
-                    this.frameX = this.attackFramesL[this.attackIdx][0];
-                    this.frameY = this.attackFramesL[this.attackIdx][1];
-                    this.attackIdx++;
-                } else {
-                    this.attackIdx = 0;
-                }
-            }
-        }
+    attack() {
+        this.attacking = true;
+        this.moving = false;
     }
 
     beingAttacked() {
@@ -163,37 +124,25 @@ export default class Demon {
         console.log(this.healthPoints);
     }
 
-    dead() {
+    handleDyingAnimation() {
         this.attacking = false;
         this.moving = false;
         if (this.healthPoints < 0) {
             this.now = Date.now();
             this.elapsed = this.now - this.then;
             if (this.elapsed < this.now + this.dyingAnimationLength) {
-                this.handleDyingFrames();
+                if (this.direction === "right") {
+                    this.handleFrames(this.dying, this.dyingFramesL, this.frameIdx);
+                } else {
+                    this.handleFrames(this.dying, this.dyingFramesR, this.frameIdx);
+                }
+            } else {
+                this.alive = false;
             }
         }
     }
 
-    handleDyingFrames() {
-        // console.log("inside handle attacking frames")
-        if (this.direction === "right") {
-            if (this.attackIdx < this.attackFramesR.length) {
-                // console.log(this.attackIdx)
-                this.frameX = this.attackFramesR[this.attackIdx][0];
-                this.frameY = this.attackFramesR[this.attackIdx][1];
-                this.attackIdx++;
-            } else {
-                this.attackIdx = 0;
-            }
-        } else {
-            if (this.attackIdx < this.attackFramesL.length) {
-                this.frameX = this.attackFramesL[this.attackIdx][0];
-                this.frameY = this.attackFramesL[this.attackIdx][1];
-                this.attackIdx++;
-            } else {
-                this.attackIdx = 0;
-            }
-        }
+    dead() {
+        this.dying = true;
     }
 }
