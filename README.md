@@ -1,12 +1,12 @@
-# GenericSidescroller
+# Edgelord
 
 ## Background
-* Generic Sidescroller is a game where the player controls a character that can move left, right, and attack.
+* Edgelord is a game where the player controls a character that can move left, right, and attack.
 * The goal is to reach the end of the level while eliminating as many enemies as possible.
 * You play as a swordsman Old Richard that was imprisoned by Demon Lord Anthony. After a decade of imprisonment, Old Richard escaped and now his sole mission is to slay Anthony with his big sword.
 
 ## Functionality & MVPs
-In Generic Sidescroller, users will be able to:
+In Edgelord, users will be able to:
 * Move player character left, right, and be able to jump.
 * Attack enemy character to accumulate points.
 * Dodge roll to avoid enemy attacks (pending).
