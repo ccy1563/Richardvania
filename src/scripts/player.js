@@ -91,13 +91,16 @@ export default class Player {
             this.x += 10;
         }
         if (this.keys["ArrowRight"] && this.playerSprite.src === playerLeft) {
-            for (let i = 0; i < 10; i++) {
-                this.keys.push("ArrowRight");
-            }
+            // for (let i = 0; i < 10; i++) {
+            //     this.keys.push("ArrowRight");
+            // }
             this.dodging = true
             this.frameY = 10;
             this.x -= 10;
-        }
+        } 
+        // if (this.keys["p"]) {
+            
+        // }
     }
     
     handleFrames() {

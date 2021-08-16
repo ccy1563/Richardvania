@@ -11,3 +11,9 @@ body {
   background-size: cover;
   min-height: 100vh;
 }
+
+.title {
+  position: relative;
+  top: 10%;
+  left: 44%;
+}

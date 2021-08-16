@@ -14,8 +14,7 @@ export default class Demon {
 
         this.attacking = false;
         this.moving = true;
-        this.toggle = false;
-        
+                
         this.dying = false;
         this.alive = true;
 
@@ -59,7 +58,7 @@ export default class Demon {
 
     move(coordinates) {
         if (this.moving === true) {
-            if (this.x > coordinates[0]) { // left
+            if (this.x > coordinates[0] ) { // player is leftside
                 if (this.direction !== "left") {
                     this.direction = "left";
                     // need this to make frames match when switching directions
@@ -69,7 +68,7 @@ export default class Demon {
                 this.moving = true;
                 this.x -= this.speed
             }
-            if (this.x < coordinates[0]) { // right
+            if (this.x < coordinates[0] -70) { // player is rightside
                 if (this.direction !== "right") {
                     this.direction = "right";
                     // need this to make frames match when switching directions

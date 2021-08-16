@@ -17,32 +17,85 @@ export default class Game {
         this.now = 0;
         this.then = 0;
         this.elapsed = 0;
-        this.startAnimation(15);
+
+        this.paused = 0;
+        this.running = 1;
+        this.gameState = this.running;
+        // this.menu = 2;
+        // this.gameover = 3;
+
+        this.keys = [];
+        this.start(15);
         this.eventListener();
-
-        this.timeID = 0;
-
         this.numOfAttacks = [0];
+
     }
 
     restart() {
         this.level = new Level(this.dimensions);
         this.player = new Player();
-        this.startAnimation(10);
+        this.demon = new Demon();
+        this.start(15);
     }
 
     eventListener() {
         const that = this;
         window.addEventListener("keyup", function(e) {
             that.player.keyUp(e);
+            that.keyUp(e);
         });
         window.addEventListener("keydown", function(e) {
             that.player.keyDown(e);
+            that.keyDown(e);
         });
+    }
+
+    keyDown(e) {
+        this.keys[e.code] = true;
+        this.setState();
+    }
+
+    keyUp(e) {
+        delete this.keys[e.code];
+    }
+
+    setState() {
+        if (this.keys["KeyP"]) { // pausing game
+            this.togglePause();
+        }
+        if (this.keys["KeyR"]) { // restart game
+            this.restart();
+        }
+    }
+
+    togglePause() {
+        if (this.gameState === this.paused) {
+            this.gameState = this.running;
+            this.animate();
+        } else {
+            this.gameState = this.paused;
+        }
+    }
+
+    pauseScreen() {
+        this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
+        this.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        this.ctx.fill();
+        this.ctx.font = "30px Papyrus";
+        this.ctx.fillStyle = "red";
+        this.ctx.textAlign = "center";
+        this.ctx.fillText("Coward.", this.dimensions.width / 2, this.dimensions.height / 2);
     }
     
     animate() {
+        // checking to see if the game is paused
+        if (this.gameState === this.paused) {
+            this.pauseScreen()
+            return;
+        }
+
         requestAnimationFrame(this.animate.bind(this));
+
         this.now = Date.now();
         this.elapsed = this.now - this.then;
         
@@ -59,7 +112,7 @@ export default class Game {
         }
     }
 
-    startAnimation(fps) {
+    start(fps) {
         this.fpsInterval = 1000 / fps;
         this.then = Date.now();
         this.startTime = this.then;
@@ -90,14 +143,18 @@ export default class Game {
                 }, 4000);
             }
             // player attacking demon
-            if ((this.player.attacking && this.player.direction === "right" && this.demon.x > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
+            if ((this.player.attacking && this.player.direction === "right" && this.demon.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
                 this.demon.beingAttacked(5);
                 if (this.demon.healthPoints < 0) {
                     this.demon.dead();
                 }
             }
             if ((this.demon.attacking && this.demon.direction === "right" && this.player.x > this.demon.x) || (this.demon.attacking && this.demon.direction === "left" && this.player.x < this.demon.x)) {
-                this.player.beingAttacked(5);
+                // lmao being on the right side hurts player even with demon attacking wut
+                // yolo bug fix
+                if (this.demon.alive && !this.demon.dying) {
+                    this.player.beingAttacked(5);
+                }
                 if (this.player.healthPoints < 0) {
                     // this.demon.dead();
                 }
