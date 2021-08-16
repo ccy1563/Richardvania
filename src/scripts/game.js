@@ -52,7 +52,7 @@ export default class Game {
             this.level.animate(this.ctx, this.canvas);
             this.player.animate(this.ctx);
             if (this.demon.alive) {
-                console.log(this.demon.alive)
+                // console.log(this.demon.alive)
                 this.demon.animate(this.ctx, this.player.coordinates());
             }
             this.registerAttacks();
@@ -94,6 +94,12 @@ export default class Game {
                 this.demon.beingAttacked(5);
                 if (this.demon.healthPoints < 0) {
                     this.demon.dead();
+                }
+            }
+            if ((this.demon.attacking && this.demon.direction === "right" && this.player.x > this.demon.x) || (this.demon.attacking && this.demon.direction === "left" && this.player.x < this.demon.x)) {
+                this.player.beingAttacked(5);
+                if (this.player.healthPoints < 0) {
+                    // this.demon.dead();
                 }
             }
         }

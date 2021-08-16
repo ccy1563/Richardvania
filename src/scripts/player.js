@@ -120,4 +120,9 @@ export default class Player {
     coordinates() {
         return [this.x, this.y];
     }
+    
+    beingAttacked(dmg) {
+        this.healthPoints -= dmg;
+        this.healthBar.takeDamage(dmg)
+    }
 }
