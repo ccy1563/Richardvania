@@ -22,7 +22,7 @@ export default class Game {
         this.running = 1;
         this.gameState = this.running;
         // this.menu = 2;
-        // this.gameover = 3;
+        this.gameOver = 3;
 
         this.keys = [];
         this.start(15);
@@ -35,6 +35,7 @@ export default class Game {
         this.level = new Level(this.dimensions);
         this.player = new Player();
         this.demon = new Demon();
+        this.gameState = this.running;
         this.start(15);
     }
 
@@ -81,16 +82,44 @@ export default class Game {
         this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
         this.ctx.fillStyle = "rgba(0,0,0,0.5)";
         this.ctx.fill();
-        this.ctx.font = "30px Papyrus";
+        this.ctx.font = "100px Papyrus";
+        // this.ctx.fillStyle = "red";
+        this.ctx.fillStyle = 'black';
+        this.ctx.strokeStyle = 'red';
+        this.ctx.textAlign = "center";
+        // this.ctx.fillText("Coward.", this.dimensions.width / 2, this.dimensions.height / 2);
+        this.ctx.fillText('Coward.', this.dimensions.width / 2, this.dimensions.height / 2);
+        this.ctx.strokeText('Coward.', this.dimensions.width / 2, this.dimensions.height / 2);
+    }
+
+    gameOverScreen() {
+        this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
+        this.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        this.ctx.fill();
+        this.ctx.font = "100px Papyrus";
+        // this.ctx.fillStyle = "red";
+        this.ctx.fillStyle = 'black';
+        this.ctx.strokeStyle = 'red';
+        this.ctx.textAlign = "center";
+        this.ctx.fillText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
+        this.ctx.strokeText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
+
+        this.ctx.font = "15px Papyrus";
         this.ctx.fillStyle = "red";
         this.ctx.textAlign = "center";
-        this.ctx.fillText("Coward.", this.dimensions.width / 2, this.dimensions.height / 2);
+        // this.ctx.fillText('lol, press R to restart, scrub.', this.dimensions.width / 2, (this.dimensions.height / 2) + 50);
+        this.ctx.fillText("Press R to redeem yourself.", this.dimensions.width / 2, (this.dimensions.height / 2) + 50);
     }
     
     animate() {
         // checking to see if the game is paused
         if (this.gameState === this.paused) {
-            this.pauseScreen()
+            this.pauseScreen();
+            return;
+        }
+
+        if (this.gameState === this.gameOver) {
+            this.gameOverScreen();
             return;
         }
 
@@ -149,14 +178,17 @@ export default class Game {
                     this.demon.dead();
                 }
             }
-            if ((this.demon.attacking && this.demon.direction === "right" && this.player.x > this.demon.x) || (this.demon.attacking && this.demon.direction === "left" && this.player.x < this.demon.x)) {
+            if ((this.demon.attacking && this.demon.direction === "right" && this.player.x > this.demon.x) || (this.demon.attacking && this.demon.direction === "left" && this.player.x - 30 < this.demon.x)) {
                 // lmao being on the right side hurts player even with demon attacking wut
                 // yolo bug fix
                 if (this.demon.alive && !this.demon.dying) {
                     this.player.beingAttacked(5);
                 }
                 if (this.player.healthPoints < 0) {
-                    // this.demon.dead();
+                    this.player.dead();
+                    setTimeout(() => {
+                        this.gameState = this.gameOver;
+                    }, 3000);
                 }
             }
         }

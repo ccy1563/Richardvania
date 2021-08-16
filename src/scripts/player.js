@@ -23,6 +23,10 @@ export default class Player {
         this.moving = true
 
         this.healthBar = new HealthBar(20,20,130,10,100,"green");
+        this.healthPoints = 130;
+
+        this.dyingFramesL = [[5, 7], [4, 7], [3, 7], [2, 7], [1, 7], [0, 7]];
+        this.dyingFramesR = [[0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7]];
 
         this.keys = [];
     }
@@ -32,9 +36,14 @@ export default class Player {
             ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
         }
         drawSprite(this.playerSprite, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width * 1.5, this.height * 1.5);
-        this.move();
-        this.handleFrames();
         this.healthBar.animate(ctx);
+        
+        if (this.dying === true) {
+            this.handleDyingAnimation();
+        } else {
+            this.move();
+            this.handleFrames();
+        }
     }
 
     keyDown(e) {
@@ -127,5 +136,45 @@ export default class Player {
     beingAttacked(dmg) {
         this.healthPoints -= dmg;
         this.healthBar.takeDamage(dmg)
+    }
+
+    handleDyingAnimation() {
+        this.attacking = false;
+        this.moving = false;
+        if (this.healthPoints < 0) {
+            // this.dying = true;
+            if (this.direction === "right") {
+                this.handleDyingFrames(this.dying, this.dyingFramesR, this.frameIdx);
+            } else {
+                this.handleDyingFrames(this.dying, this.dyingFramesL, this.frameIdx);
+            }
+        }
+    }
+
+
+    handleDyingFrames(action, framesArr, frameIdx) {
+        const that = this;
+        if (action === true) {
+            if (frameIdx < framesArr.length) {
+                that.frameX = framesArr[frameIdx][0];
+                that.frameY = framesArr[frameIdx][1];
+                that.frameIdx++;
+            } else {
+                that.frameX = framesArr[framesArr.length - 1][0];
+                that.frameY = framesArr[framesArr.length - 1][1];
+                setTimeout(function () {
+                    that.frameX = framesArr[framesArr.length - 1];
+                    // that.dying = false;
+                    // console.log(that.dying);
+                    // that.moving = true;
+                    that.alive = false;
+                    // that.dying = false;
+                }, 3000);
+            }
+        }
+    }
+
+    dead() {
+        this.dying = true;
     }
 }
