@@ -34,7 +34,7 @@ export default class Player {
         drawSprite(this.playerSprite, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width * 1.5, this.height * 1.5);
         this.move();
         this.handleFrames();
-        this.healthBar.show(ctx);
+        this.healthBar.animate(ctx);
     }
 
     keyDown(e) {

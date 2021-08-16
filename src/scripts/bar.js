@@ -10,12 +10,12 @@ export default class HealthBar {
         this.color = color;
     }
 
-    show(context) {
-        context.lineWith = 5;
-        context.strokeStyle = "#333";
-        context.fillStyle = this.color;
-        context.fillRect(this.x, this.y, this.w, this.h);
-        context.strokeRect(this.x, this.y, this.maxWidth, this.h);
+    animate(ctx) {
+        ctx.lineWith = 5;
+        ctx.strokeStyle = "#333";
+        ctx.fillStyle = this.color;
+        ctx.fillRect(this.x, this.y, this.w, this.h);
+        ctx.strokeRect(this.x, this.y, this.maxWidth, this.h);
     }
 
     takeDamage(damagePerHit) {
