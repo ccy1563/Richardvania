@@ -2,18 +2,6 @@ import playerRight from "../assets/HeroRight.png"
 import playerLeft from "../assets/HeroLeft.png"
 import HealthBar from "../scripts/bar.js"
 
-// import playerAttackLeft from "../assets/hero/left/attack.png"
-// import playerBlockLeft from "../assets/hero/left/block.png"
-// import playerDodgeLeft from "../assets/hero/left/dodge.png"
-// import playerIdleLeft from "../assets/hero/left/idle.png"
-// import playerRunLeft from "../assets/hero/left/run.png"
-
-// import playerAttackRight from "../assets/hero/Right/attack.png"
-// import playerBlockRight from "../assets/hero/Right/block.png"
-// import playerDodgeRight from "../assets/hero/Right/dodge.png"
-// import playerIdleRight from "../assets/hero/Right/idle.png"
-// import playerRunRight from "../assets/hero/Right/run.png"
-
 export default class Player {
     constructor() {
         this.x = 0;
@@ -23,7 +11,6 @@ export default class Player {
         this.frameX = 0;
         this.frameY = 0;
         this.speed = 8;
-        this.y_velocity = 0;
         this.direction = "right";
 
         this.playerSprite = new Image();
@@ -35,9 +22,6 @@ export default class Player {
         this.attacking = false;
         this.moving = true
 
-        this.atkFrames = [[5,2], [0,3], [1,3], [2,3], [3,3], [4,3], [5,3]];
-        this.atkFramesIdx = 0;
-
         this.healthBar = new HealthBar(20,20,130,10,100,"green");
 
         this.keys = [];
@@ -47,26 +31,18 @@ export default class Player {
         function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
             ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
         }
-
         drawSprite(this.playerSprite, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width * 1.5, this.height * 1.5);
-
         this.move();
-        this.attack();
-        this.dodgeRoll();
         this.handleFrames();
         this.healthBar.show(ctx);
-        // this.fall();
-        // this.handleAttackFrame();
     }
 
     keyDown(e) {
         this.keys[e.code] = true;
-        // this.action = "move";
     }
 
     keyUp(e) {
         delete this.keys[e.code];
-        // this.action = "move";
         this.frameY = 0;
         this.attacking = false;
         this.moving = false;
@@ -81,6 +57,7 @@ export default class Player {
             this.moving = true;
             this.x += this.speed;
             this.frameY = 1;
+            
         }
         if (this.keys["KeyA"]) { // left
             this.playerSprite.src = playerLeft;
@@ -94,10 +71,6 @@ export default class Player {
             this.y_velocity -= 5;
             this.jumping = true;
         }
-    }
-    
-    attack() {
-        // if (this.keys["ArrowLeft"] && !this.attackArr.length === 5) 
         if (this.keys["ArrowLeft"]) {
             this.attacking = true;
             this.frameY = 3;
@@ -108,9 +81,6 @@ export default class Player {
             this.frameY = 4;
             // this.moving = true;
         }
-    }
-
-    dodgeRoll() {
         if (this.keys["ArrowRight"] && this.playerSprite.src === playerRight) {
             for (let i = 0; i < 10; i++) {
                 this.keys["ArrowRight"];
@@ -131,11 +101,7 @@ export default class Player {
     }
     
     handleFrames() {
-        // if key is not pressed -- execute idle animations
         if (this.playerSprite.src === playerRight) {
-            // if (!this.action && this.frameY !== 0) {
-            //     this.frameY = 0;
-            // }
             if (this.frameX < 5) {
                 this.frameX++;
             } else {
@@ -143,9 +109,6 @@ export default class Player {
             }
         } 
         if (this.playerSprite.src === playerLeft) {
-            // if (!this.action && this.frameY !== 0) {
-            //     this.frameY = 0;
-            // }
             if (this.frameX >= 1) {
                 this.frameX--;
             } else {
@@ -153,18 +116,6 @@ export default class Player {
             }
         }
     }
-    
-    // handleAttackFrame() {
-    //     if (this.attacking == true) {
-    //         if (this.atkFramesIdx > 0) {
-    //             this.frameX = this.atkFrames[this.atkFramesIdx][0];
-    //             this.frameY = this.atkFrames[this.atkFramesIdx][1];
-    //             this.atkFramesIdx--;
-    //         } else {
-    //             this.atkFramesIdx = this.atkFrames.length - 1;
-    //         }
-    //     }
-    // }
 
     coordinates() {
         return [this.x, this.y];

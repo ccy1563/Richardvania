@@ -48,8 +48,9 @@ export default class Game {
             this.then = this.now - (this.elapsed % this.fpsInterval);
             this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
             this.level.animate(this.ctx, this.canvas);
+            this.player.animate(this.ctx);
             if (this.demon.alive) {
-                this.player.animate(this.ctx);
+                console.log(this.demon.alive)
                 this.demon.animate(this.ctx, this.player.coordinates());
             }
             this.registerAttacks();
@@ -83,6 +84,7 @@ export default class Game {
     registerAttacks() {
         if (this.collision(this.player, this.demon)) {
             // demon attacking player all the time, wtf how to make it stop
+            
             this.demon.attack();
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.demon.x > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
