@@ -21,6 +21,8 @@ export default class Game {
         this.eventListener();
 
         this.timeID = 0;
+
+        this.numOfAttacks = [0];
     }
 
     restart() {
@@ -64,34 +66,33 @@ export default class Game {
         this.animate();
     }
 
-    collision(player, demon) {
-        if (player.x > demon.x + demon.width ||
-            player.x + player.width < demon.x ||
+    collision(player, demon, x1, x2) {
+        if (player.x + x1 > demon.x + demon.width ||
+            player.x + player.width - x2 < demon.x ||
             player.y > demon.y + demon.height ||
             player.y + player.height < demon.y) {
-            // no collision
-            console.log("no collision");
             return false;
         } else {
-            console.log("collision");
-            // enemy character should attack player character 
-            // make sure to (throttle?) so that it isnt spamming the shit out of attack
-            // maybe setInverval? fk me idk
             return true;
         }
     }
 
     registerAttacks() {
-        if (this.collision(this.player, this.demon)) {
-            // demon attacking player all the time, wtf how to make it stop
-            
-            this.demon.attack();
+        if (this.collision(this.player, this.demon, 30, 60)) {
+            // demon spamming attack all the time, wtf how to make it stop
+            if (this.numOfAttacks.length > 0) { // bro how is this even working lmao
+                this.numOfAttacks.shift();
+                this.demon.attack();
+            } else {
+                const that = this;
+                setTimeout(function() {
+                    that.numOfAttacks.push(0);
+                }, 4000);
+            }
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.demon.x > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
-                this.demon.healthBar.takeDamage(75);
-                this.demon.beingAttacked();
+                this.demon.beingAttacked(5);
                 if (this.demon.healthPoints < 0) {
-                    console.log("dead");
                     this.demon.dead();
                 }
             }
