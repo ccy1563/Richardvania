@@ -1,6 +1,7 @@
 import Player from "../scripts/player.js";
 import Level from "../scripts/level.js";
 import Demon from "../scripts/demon.js";
+import Rogue from "../scripts/rogue.js";
 // import Utility from "../scripts/utility.js";
 
 export default class Game {
@@ -11,6 +12,7 @@ export default class Game {
         this.level = new Level(this.dimensions);
         this.player = new Player();
         this.demon = new Demon();
+        this.rogue = new Rogue();
         this.fpsInterval = 0;
         this.then = 0;
         this.startTime = 0;
@@ -145,6 +147,7 @@ export default class Game {
         this.fpsInterval = 1000 / fps;
         this.then = Date.now();
         this.startTime = this.then;
+        // this.animate();
         this.animate();
     }
 
@@ -193,4 +196,46 @@ export default class Game {
             }
         }
     }
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+    //////////////////////////////////////////////////////////////////////////
+
+    // animate2() {
+    //     requestAnimationFrame(this.animate2.bind(this));
+
+    //     this.now = Date.now();
+    //     this.elapsed = this.now - this.then;
+
+    //     if (this.elapsed > this.fpsInterval) {
+    //         this.then = this.now - (this.elapsed % this.fpsInterval);
+    //         this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
+    //         this.level.animate(this.ctx, this.canvas);
+    //         this.player.animate(this.ctx);
+
+    //         if (this.rogue.alive) {
+    //             this.rogue.animate(this.ctx, this.player.coordinates());
+    //         }
+    //         this.registerAttacks2();
+    //     }
+    // }
+
+    // registerAttacks2() {
+    //     if (this.numOfAttacks.length > 0) { // bro how is this even working lmao
+    //         this.numOfAttacks.shift();
+    //         // console.log("ATTACKING")
+    //         this.rogue.attack();
+    //     } else {
+    //         const that = this;
+    //         setTimeout(function () {
+    //             that.numOfAttacks.push(0);
+    //         }, 4000);
+    //     }
+    // }
 }
