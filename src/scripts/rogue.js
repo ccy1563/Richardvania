@@ -1,6 +1,7 @@
 import playerRight from "../assets/rogue/RogueRight.png"
 import playerLeft from "../assets/rogue/RogueLeft.png"
 import HealthBar from "../scripts/bar.js"
+import Shuriken from "../scripts/shuriken.js";
 
 
 export default class Rogue {
@@ -25,6 +26,10 @@ export default class Rogue {
         this.playerSprite = new Image();
         this.playerSprite.src = playerLeft;
 
+        // this.shuriken = new Shuriken(580, 370, 20);
+
+        this.thrown = false;
+
         this.direction = "left"; 
 
         this.frameIdx = 0;
@@ -34,16 +39,34 @@ export default class Rogue {
         this.idleFramesR = [
             [0, 0], [1, 0], [2, 0], [3, 0], 
             [4, 0], [5, 0], [6, 0], [7, 0]];
-        this.attackFramesL = [[7, 7], [6, 7], [5, 7], [4, 7], [3, 7], [2, 7], [1, 7], [0, 7]];
-        this.attackFramesR = [[0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7]];
-        this.dyingFramesL = [[7, 3], [6, 3], [5, 3], [4, 3], [3, 3], [2, 3], [1, 3], [0, 3]];
-        this.dyingFramesR = [[0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3]];
-        this.teleportFramesLPhase1 = [[7, 10], [6, 10], [5, 10], [4, 10], [3, 10], [2, 10], [1, 10], [0, 10]];
-        this.teleportFramesLPhase2 = [[7, 11], [6, 11], [5, 11], [4, 11], [3, 11], [2, 11], [1, 11], [0, 11]];
-        this.teleportFramesRPhase1 = [[0, 10], [1, 10], [2, 10], [3, 10], [4, 10], [5, 10], [6, 10], [7, 10]];
-        this.teleportFramesRPhase2 = [[0, 11], [1, 11], [2, 11], [3, 11], [4, 11], [5, 11], [6, 11], [7, 11]];
+        this.attackFramesL = [
+            [7, 7], [6, 7], [5, 7], [4, 7], 
+            [3, 7], [2, 7], [1, 7], [0, 7]];
+        this.attackFramesR = [
+            [0, 7], [1, 7], [2, 7], [3, 7], 
+            [4, 7], [5, 7], [6, 7], [7, 7]];
+        this.dyingFramesL = [
+            [7, 3], [6, 3], [5, 3], [4, 3], 
+            [3, 3], [2, 3], [1, 3], [0, 3]];
+        this.dyingFramesR = [
+            [0, 3], [1, 3], [2, 3], [3, 3], 
+            [4, 3], [5, 3], [6, 3], [7, 3]];
+        this.teleportFramesLPhase1 = [
+            [7, 10], [6, 10], [5, 10], [4, 10],
+             [3, 10], [2, 10], [1, 10], [0, 10]];
+        this.teleportFramesLPhase2 = [
+            [7, 11], [6, 11], [5, 11], [4, 11], 
+            [3, 11], [2, 11], [1, 11], [0, 11]];
+        this.teleportFramesRPhase1 = [
+            [0, 10], [1, 10], [2, 10], [3, 10], 
+            [4, 10], [5, 10], [6, 10], [7, 10]];
+        this.teleportFramesRPhase2 = [
+            [0, 11], [1, 11], [2, 11], [3, 11],     
+            [4, 11], [5, 11], [6, 11], [7, 11]];
 
         this.numOfAttacks = 1;
+        this.shuriken = new Shuriken(580, 370, 20);
+        this.shurikenArr = [this.shuriken];
 
         this.keys = [];
     }
@@ -77,10 +100,27 @@ export default class Rogue {
                 this.numOfAttacks--;
                 setTimeout(() => {
                     this.numOfAttacks = 1;
-                }, 3000);
+                    this.shurikenArr.shift();
+                    this.shurikenArr.push(new Shuriken(580, 370, 20))
+                }, 7000);
             }
             this.handleAttackFrames();
+            this.throwShuriken(ctx);
             this.handleIdleFrames();
+
+            // if (this.shuriken.hit()) {
+            //     console.log("HIT")
+            //     this.thrown = false;
+            // }
+        }
+    }
+
+    throwShuriken(ctx) {
+        if (this.thrown) {
+            if (this.direction === "left") {
+                this.shurikenArr[0].animate(ctx);
+            }
+            // else facing right side
         }
     }
 
@@ -92,6 +132,7 @@ export default class Rogue {
             this.frameY = framesArr[this.frameIdx][1];
             this.frameIdx++;
         } else {
+            this.thrown = true; // animates shuriken the moment rogue's attack frame ends
             this.frameIdx = 0;
             this.attacking = false;
             this.idle = true;
@@ -185,7 +226,6 @@ export default class Rogue {
     }
 
     beingAttacked(dmg) {
-        console.log("ROGUE IS HIT")
         this.healthPoints -= dmg;
         this.healthBar.takeDamage(dmg);
         if (this.healthPoints < 0) this.dying = true;

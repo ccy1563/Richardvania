@@ -2,6 +2,7 @@ import Player from "../scripts/player.js";
 import Level from "../scripts/level.js";
 import Demon from "../scripts/demon.js";
 import Rogue from "../scripts/rogue.js";
+import Shuriken from "../scripts/shuriken";
 // import Utility from "../scripts/utility.js";
 
 export default class Game {
@@ -13,6 +14,7 @@ export default class Game {
         this.player = new Player();
         this.demon = new Demon();
         this.rogue = new Rogue();
+        // this.shuriken = new Shuriken(100, 100, 20);
 
         this.fpsInterval = 0;
         this.startTime = 0;
