@@ -2,7 +2,7 @@ import shurikenLeft from "../assets/rogue/ShurikenLeft.png";
 import shurikenRight from "../assets/rogue/ShurikenRight.png";
 
 export default class Shuriken {
-    constructor(x, y, speed) {
+    constructor(x, y, speed, direction) {
         this.x = x;
         this.y = y;
         this.speed = speed;
@@ -12,7 +12,9 @@ export default class Shuriken {
         this.frameY = 0;
 
         this.moving = false;
-        this.direction = "left";
+        this.direction = direction;
+
+        this.throw = false;
 
         this.frameL = [[2, 0], [1, 0], [0, 0], [2, 1], [1, 1], [0, 1]];
         this.frameR = [[0, 0], [1, 0], [2, 0], [0, 1], [1, 1], [2, 1]];
@@ -36,17 +38,17 @@ export default class Shuriken {
             this.width * 1.5,
             this.height * 1.5);
 
-        this.move();
-        // this.hit();
-        this.handleFrames();
+            this.move();
+            this.handleFrames();
     }
 
     move() {
         this.moving = true;
-        if (this.direction = "left") {
-            this.x -= 50;
+        // console.log(`shuriken direction ${this.direction}`)
+        if (this.direction === "left") {
+            this.x -= this.speed;
         } else {
-            this.x += 50;
+            this.x += this.speed;
         }
     }
 
@@ -65,8 +67,7 @@ export default class Shuriken {
     }
 
     hit() {
-        if (this.x < 0 || this.x > 500) {
-            // console.log("shuriken deleted");
+        if (this.x < - 70 || this.x > 670) {
             return true
         } else {
             return false;

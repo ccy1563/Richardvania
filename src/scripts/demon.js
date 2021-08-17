@@ -19,13 +19,22 @@ export default class Demon {
         this.alive = true;
 
         this.healthPoints = 750;
-        this.healthBar = new HealthBar(20, 480, 750, 10, 100, "yellow");
+        this.healthBar = new HealthBar(20, 480, 750, 10, 100, "green");
 
         this.playerSprite= new Image();
         this.playerSprite.src = playerLeft;
         
         this.direction = "left";
-        this.frameIdx = 0;
+        // this.frameIdx = 0;
+
+        this.actionIndices = {
+            movementIdx: 0,
+            idleIdx: 0,
+            dyingIdx: 0,
+            attackingIdx: 0,
+            dodgingIdx: 0
+        }
+
         this.movementFramesL = [
             [3, 3], [2, 3], [1, 3], [0, 3], 
             [5, 4], [4, 4], [3, 4], [2, 4]];
@@ -36,7 +45,7 @@ export default class Demon {
             [1, 1], [0, 1], [5, 2], [4, 2], [3, 2], 
             [2, 2], [1, 2], [0, 2], [5, 3], [4, 3]];
         this.attackFramesR = [
-            [4, 1],[4, 2], [0, 2], [1, 2], [2, 2], 
+            [4, 1], [5, 1], [0, 2], [1, 2], [2, 2], 
             [3, 2], [4, 2], [5, 2], [0, 3], [1, 3]];
         this.dyingFramesL = [
             [0, 5], [5, 6], [4, 6], 
@@ -94,13 +103,13 @@ export default class Demon {
         if (this.attacking && !this.moving) {
             let framesArr = this.attackFramesL;
             if (this.direction === "right") framesArr = this.attackFramesR;
-            if (this.frameIdx < framesArr.length) {
-                this.frameX = framesArr[this.frameIdx][0];
-                this.frameY = framesArr[this.frameIdx][1];
-                this.frameIdx++;
+            if (this.actionIndices["attackingIdx"] < framesArr.length) {
+                this.frameX = framesArr[this.actionIndices["attackingIdx"]][0];
+                this.frameY = framesArr[this.actionIndices["attackingIdx"]][1];
+                this.actionIndices["attackingIdx"]++;
             } else {
                 this.attacking = false;
-                this.frameIdx = 0;
+                this.actionIndices["attackingIdx"] = 0;
                 this.moving = true;
             }
         }
@@ -110,14 +119,14 @@ export default class Demon {
         if (this.moving && !this.attacking) {
             let framesArr = this.movementFramesL;
             if (this.direction === "right") framesArr = this.movementFramesR;
-            if (this.frameIdx < framesArr.length) {
-                this.frameX = framesArr[this.frameIdx][0];
-                this.frameY = framesArr[this.frameIdx][1];
-                this.frameIdx++;
+            if (this.actionIndices["movementIdx"] < framesArr.length) {
+                this.frameX = framesArr[this.actionIndices["movementIdx"]][0];
+                this.frameY = framesArr[this.actionIndices["movementIdx"]][1];
+                this.actionIndices["movementIdx"]++;
             } else {
-                this.frameIdx = 0;
-                this.frameX = framesArr[this.frameIdx][0];
-                this.frameY = framesArr[this.frameIdx][1];
+                this.actionIndices["movementIdx"] = 0;
+                this.frameX = framesArr[this.actionIndices["movementIdx"]][0];
+                this.frameY = framesArr[this.actionIndices["movementIdx"]][1];
             }
         }
     }
@@ -148,10 +157,10 @@ export default class Demon {
     handleDyingFrames() {
         let framesArr = this.dyingFramesL;
         if (this.direction === "right") framesArr = this.dyingFramesR;
-        if (this.frameIdx < framesArr.length) {
-            this.frameX = framesArr[this.frameIdx][0];
-            this.frameY = framesArr[this.frameIdx][1];
-            this.frameIdx++;
+        if (this.actionIndices["dyingIdx"] < framesArr.length) {
+            this.frameX = framesArr[this.actionIndices["dyingIdx"]][0];
+            this.frameY = framesArr[this.actionIndices["dyingIdx"]][1];
+            this.actionIndices["dyingIdx"]++;
         } else {
             const that = this;
             // dead body remains displayed for brief moment after death

@@ -6,7 +6,7 @@ import Shuriken from "../scripts/shuriken.js";
 
 export default class Rogue {
     constructor() {
-        this.x = 600;
+        this.x = 690;
         this.y = 305;
         this.width = 100;
         this.height = 100,
@@ -15,12 +15,12 @@ export default class Rogue {
         this.speed = 3;
 
         this.attacking = false;
-        this.idle = false;
+        this.idle = true;
 
         this.dying = false;
         this.alive = true;
 
-        this.healthBar = new HealthBar(20, 480, 750, 10, 100, "yellow");
+        this.healthBar = new HealthBar(20, 470, 750, 10, 100, "purple");
         this.healthPoints = 750;
 
         this.playerSprite = new Image();
@@ -30,9 +30,18 @@ export default class Rogue {
 
         this.thrown = false;
 
+        this.teleport1 = false;
+        this.teleport2 = false;
+        this.invincible = false;
+
         this.direction = "left"; 
 
-        this.frameIdx = 0;
+        this.actionIndices = {
+            idleIdx: 0,
+            dyingIdx: 0,
+            attackingIdx: 0,
+            teleportIdx: 0,
+        }
         this.idleFramesL = [
             [7, 0], [6, 0], [5, 0], [4, 0], 
             [3, 0], [2, 0], [1, 0], [0, 0]];
@@ -53,20 +62,20 @@ export default class Rogue {
             [4, 3], [5, 3], [6, 3], [7, 3]];
         this.teleportFramesLPhase1 = [
             [7, 10], [6, 10], [5, 10], [4, 10],
-             [3, 10], [2, 10], [1, 10], [0, 10]];
+             [3, 10], [2, 10], [1, 10], [1, 10], [1, 10], [0, 10]];
         this.teleportFramesLPhase2 = [
             [7, 11], [6, 11], [5, 11], [4, 11], 
-            [3, 11], [2, 11], [1, 11], [0, 11]];
+            [3, 11], [3, 11], [3, 11], [2, 11], [1, 11], [0, 11]];
         this.teleportFramesRPhase1 = [
             [0, 10], [1, 10], [2, 10], [3, 10], 
-            [4, 10], [5, 10], [6, 10], [7, 10]];
+            [4, 10], [5, 10], [6, 10], [6, 10], [6, 10], [7, 10]];
         this.teleportFramesRPhase2 = [
             [0, 11], [1, 11], [2, 11], [3, 11],     
-            [4, 11], [5, 11], [6, 11], [7, 11]];
+            [4, 11], [4, 11], [4, 11], [5, 11], [6, 11], [7, 11]];
 
         this.numOfAttacks = 1;
-        this.shuriken = new Shuriken(580, 370, 20);
-        this.shurikenArr = [this.shuriken];
+        this.currentShuriken = new Shuriken(580, 370, 20, this.direction);
+        this.shurikenArr = [this.currentShuriken];
 
         this.keys = [];
     }
@@ -93,49 +102,112 @@ export default class Rogue {
             this.idle = false;
             this.attacking = false;
             this.handleDyingFrames();
-        } else {
-            // one attack per 3 seconds
-            if (this.numOfAttacks > 0) {
-                this.attacking = true;
-                this.numOfAttacks--;
-                setTimeout(() => {
-                    this.numOfAttacks = 1;
-                    this.shurikenArr.shift();
-                    this.shurikenArr.push(new Shuriken(580, 370, 20))
-                }, 7000);
-            }
-            this.handleAttackFrames();
-            this.throwShuriken(ctx);
-            this.handleIdleFrames();
+        }
+        setTimeout(() => { // delay before rogue starts attacking
+            if (this.shurikenArr.length > 0) {
+                this.attacking = true; // set attacking to true
+                this.idle = false;
+            } else {
 
-            // if (this.shuriken.hit()) {
-            //     console.log("HIT")
-            //     this.thrown = false;
-            // }
+                if (this.direction === "left") {
+                    // console.log(this.direction)
+                    this.shurikenArr.push(new Shuriken(580, 370, 20, this.direction)); // in 7 seconds load shuriken to use
+                } else {
+                    this.shurikenArr.push(new Shuriken(70, 370, 20, this.direction)); // in 7 seconds load 
+                }
+            }
+        }, 1000);
+        this.handleIdleFrames();
+        if (this.thrown) {
+            this.shurikenArr[0].animate(ctx)
+            if (this.shurikenArr[0].hit()) {
+                this.shurikenArr.shift();
+                this.idle = true;
+                this.thrown = false;
+                this.attacking = false;
+            }
+        } else {
+            this.handleAttackFrames();
+        }
+
+        if (this.teleport1) {
+            this.handleTeleportFramesPhase1();
+        }
+
+        if (this.teleport2) {
+            this.handleTeleportFramesPhase2();
+        }
+
+        // console.log(`idle: ${this.idle}`)
+        // console.log(`attacking: ${this.attacking}`)
+        // console.log(`shurikenarr: ${this.shurikenArr.length}`)
+    }
+
+    beingAttacked(dmg) {
+        if (!this.invincible) {
+            this.healthPoints -= dmg;
+            this.healthBar.takeDamage(dmg);
+            if (this.healthPoints < 0) this.dying = true;
+            // teleport
+            // this.invincible = true;
+            this.teleport1 = true;
+            this.idle = false;
+            this.attacking = false;
         }
     }
 
-    throwShuriken(ctx) {
-        if (this.thrown) {
-            if (this.direction === "left") {
-                this.shurikenArr[0].animate(ctx);
+    handleTeleportFramesPhase1() {
+        let framesArr = this.teleportFramesLPhase1;
+        if (this.direction === "right") framesArr = this.teleportFramesRPhase1;
+        if (this.actionIndices["teleportIdx"] < framesArr.length) {
+            this.frameX = framesArr[this.actionIndices["teleportIdx"]][0];
+            this.frameY = framesArr[this.actionIndices["teleportIdx"]][1];
+            this.actionIndices["teleportIdx"]++;
+        } else {
+            const that = this;
+            this.frameX = framesArr[framesArr.length - 1][0];
+            this.frameY = framesArr[framesArr.length - 1][1];
+            if (that.direction === "left") {
+                that.x = -50;
+            } else {
+                that.x = 690;
             }
-            // else facing right side
+            that.teleport1 = false;
+            that.teleport2 = true;
+            that.actionIndices["teleportIdx"] = 0;
+        }
+    }
+
+    handleTeleportFramesPhase2() {
+        let framesArr = this.teleportFramesLPhase2;
+        if (this.direction === "right") framesArr = this.teleportFramesRPhase2;
+        if (this.actionIndices["teleportIdx"] < framesArr.length) {
+            this.frameX = framesArr[this.actionIndices["teleportIdx"]][0];
+            this.frameY = framesArr[this.actionIndices["teleportIdx"]][1];
+            this.actionIndices["teleportIdx"]++;
+        } else {
+            this.invincible = false;
+            this.teleport2 = false;
+            // this.frameX = framesArr[framesArr.length - 1][0];
+            // this.frameY = framesArr[framesArr.length - 1][1];
+            this.actionIndices["teleportIdx"] = 0;
         }
     }
 
     handleAttackFrames() {
-        let framesArr = this.attackFramesL;
-        if (this.direction === "right") framesArr = this.attackFramesR;
-        if (this.frameIdx < framesArr.length) {
-            this.frameX = framesArr[this.frameIdx][0];
-            this.frameY = framesArr[this.frameIdx][1];
-            this.frameIdx++;
-        } else {
-            this.thrown = true; // animates shuriken the moment rogue's attack frame ends
-            this.frameIdx = 0;
-            this.attacking = false;
-            this.idle = true;
+        if (this.attacking && !this.idle && this.shurikenArr.length > 0) {
+            let framesArr = this.attackFramesL;
+            if (this.direction === "right") framesArr = this.attackFramesR;
+            if (this.actionIndices["attackingIdx"] < framesArr.length) {
+                this.frameX = framesArr[this.actionIndices["attackingIdx"]][0];
+                this.frameY = framesArr[this.actionIndices["attackingIdx"]][1];
+                this.actionIndices["attackingIdx"]++;
+            } else {
+                this.thrown = true; // animates shuriken the moment rogue's attack frame ends
+                this.attacking = false;
+                this.idle = true;
+                this.actionIndices["attackingIdx"] = 0;
+            }
         }
     }
 
@@ -143,14 +215,14 @@ export default class Rogue {
         if (this.idle && !this.attacking) {
             let framesArr = this.idleFramesL;
             if (this.direction === "right") framesArr = this.idleFramesR;
-            if (this.frameIdx < framesArr.length) {
-                this.frameX = framesArr[this.frameIdx][0];
-                this.frameY = framesArr[this.frameIdx][1];
-                this.frameIdx++;
+            if (this.actionIndices["idleIdx"] < framesArr.length) {
+                this.frameX = framesArr[this.actionIndices["idleIdx"]][0];
+                this.frameY = framesArr[this.actionIndices["idleIdx"]][1];
+                this.actionIndices["idleIdx"]++;
             } else {
-                this.frameIdx = 0;
-                this.frameX = framesArr[this.frameIdx][0];
-                this.frameY = framesArr[this.frameIdx][1];
+                this.actionIndices["idleIdx"] = 0;
+                this.frameX = framesArr[this.actionIndices["idleIdx"]][0];
+                this.frameY = framesArr[this.actionIndices["idleIdx"]][1];
             }
         }
     }
@@ -158,10 +230,10 @@ export default class Rogue {
     handleDyingFrames() {
         let framesArr = this.dyingFramesL;
         if (this.direction === "right") framesArr = this.dyingFramesR;
-        if (this.frameIdx < framesArr.length) {
-            this.frameX = framesArr[this.frameIdx][0];
-            this.frameY = framesArr[this.frameIdx][1];
-            this.frameIdx++;
+        if (this.actionIndices["dyingIdx"] < framesArr.length) {
+            this.frameX = framesArr[this.actionIndices["dyingIdx"]][0];
+            this.frameY = framesArr[this.actionIndices["dyingIdx"]][1];
+            this.actionIndices["dyingIdx"]++;
         } else {
             const that = this;
             this.frameX = framesArr[framesArr.length-1][0];
@@ -172,64 +244,17 @@ export default class Rogue {
             }, 3000);
         }
     }
-
-    // handleTeleportFramesPhase1() {
-    //     // if (this.y < 300) {
-    //     //     this.y -= 100;
-    //     // }
-    //     let framesArr = this.teleportFramesLPhase1;
-    //     if (this.direction === "right") framesArr = this.teleportFramesLPhase2;
-    //     if (this.frameIdx < framesArr.length) {
-    //         if (this.x > 0) {
-    //             this.x -= 50;
-    //         } else {
-    //             this.x += 100
-    //         }
-    //         this.frameX = framesArr[this.frameIdx][0];
-    //         this.frameY = framesArr[this.frameIdx][1];
-    //         this.frameIdx++;
-    //     } else {
-    //         const that = this;
-    //         this.frameX = framesArr[framesArr.length - 1][0];
-    //         this.frameY = framesArr[framesArr.length - 1][1];
-    //         setTimeout(function () {
-    //             // call phase ?
-    //             this.handleTeleportFramesPhase2()
-    //         }, 3000);
-    //     }
-    // }
-
-    // handleTeleportFramesPhase2() {
-    //     let framesArr = this.teleportFramesLPhase2;
-    //     if (this.direction === "right") framesArr = this.teleportFramesRPhase2;
-    //     if (this.frameIdx < framesArr.length) {
-    //         this.frameX = framesArr[this.frameIdx][0];
-    //         this.frameY = framesArr[this.frameIdx][1];
-    //         this.frameIdx++;
-    //     } else {
-    //         this.frameX = framesArr[framesArr.length - 1][0];
-    //         this.frameY = framesArr[framesArr.length - 1][1];
-    //     }
-    // }
     
     move(coordinates) {
         if (this.x > coordinates[0]) { // player is leftside
             if (this.direction !== "left") this.direction = "left";
             this.playerSprite.src = playerLeft;
-            this.idle = true;
+            // this.idle = true;
         }
         if (this.x < coordinates[0]) { // player is rightside
             if (this.direction !== "right") this.direction = "right";
             this.playerSprite.src = playerRight;
-            this.idle = true;
+            // this.idle = true;
         }
-    }
-
-    beingAttacked(dmg) {
-        this.healthPoints -= dmg;
-        this.healthBar.takeDamage(dmg);
-        if (this.healthPoints < 0) this.dying = true;
-        // teleport
-        // this.handleTeleportFramesPhase1();
     }
 }

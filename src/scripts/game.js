@@ -29,7 +29,7 @@ export default class Game {
         // this.menu = 2;
         
         this.keys = [];
-        this.currentLevel = 1;
+        this.currentLevel = 0;
         this.start(15);
         this.eventListener();
 
@@ -146,6 +146,11 @@ export default class Game {
                 this.demon.animate(this.ctx, this.player.coordinates());
             }
             this.registerAttacks1();
+
+            if (this.rogue.alive) {
+                this.rogue.animate(this.ctx, this.player.coordinates());
+            }
+            this.registerAttacks2();
         }
     }
 
@@ -215,7 +220,7 @@ export default class Game {
     }
 
     registerAttacks2() {
-        if (this.collision(this.player, this.demon, 0, 0)) {
+        if (this.collision(this.player, this.rogue, 0, 0)) {
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.rogue.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.rogue.x < this.player.x)) {
                 this.rogue.beingAttacked(5);

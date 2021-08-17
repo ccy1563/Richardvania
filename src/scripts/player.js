@@ -28,7 +28,15 @@ export default class Player {
         this.healthBar = new HealthBar(20,20,150,10,100,"green");
         this.healthPoints = 150;
 
-        this.frameIdx = 0;
+        // need this so that one action animation doesn't interfere with other action animations
+        this.actionIndices = {
+            movementIdx: 0,
+            idleIdx: 0,
+            dyingIdx: 0,
+            attackingIdx: 0,
+            dodgingIdx: 0
+        }
+
         this.idleFramesL = [
             [5, 0], [4, 0], [3, 0], 
             [2, 0], [1, 0], [0, 0]];
@@ -48,15 +56,13 @@ export default class Player {
             [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], 
             [5, 7], [0, 8], [1, 8], [2, 8], [3, 8], [4, 8]];
         this.attackFramesL = [
-            [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], 
-            [0, 5], [5, 4], [4, 4], [3, 4], [2, 4], 
-            [1, 4], [0, 4], [5, 3], [4, 3], [3, 3], 
-            [2, 3], [1, 3], [0, 3], [5, 2]];
+            [1, 2], [0, 2], [5, 3], [4, 3], [3, 3], [2, 3], [1, 3], 
+            [0, 3], [5, 4], [4, 4], [3, 4], [2, 4], [1, 4], [0, 4], 
+            [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], [0, 5]];
         this.attackFramesR = [
-            [5, 2], [0, 3], [1, 3], [2, 3], [3, 3], 
-            [4, 3], [5, 3], [0, 4], [1, 4], [2, 4], 
-            [3, 4], [4, 4], [5, 4], [0, 5], [1, 5], 
-            [2, 5], [3, 5], [4, 5], [5, 5]];
+            [4, 2], [5, 2], [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], 
+            [5, 3], [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], 
+            [0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5]];
 
         // this.dodgeIdx = 0;
         this.dodgeFramesL = [
@@ -92,10 +98,10 @@ export default class Player {
             this.handleDyingFrames();
         } else {
             this.move();
-            this.handleFrames(this.moving, this.movementFramesL, this.movementFramesR);
-            this.handleFrames(this.idle, this.idleFramesL, this.idleFramesR);
-            this.handleFrames(this.attacking, this.attackFramesL, this.attackFramesR);
-            this.handleFrames(this.dodging, this.dodgeFramesL, this.dodgeFramesR);
+            this.handleFrames(this.moving, this.movementFramesL, this.movementFramesR, "movementIdx");
+            this.handleFrames(this.idle, this.idleFramesL, this.idleFramesR, "idleIdx");
+            this.handleFrames(this.attacking, this.attackFramesL, this.attackFramesR, "attackingIdx");
+            this.handleFrames(this.dodging, this.dodgeFramesL, this.dodgeFramesR, "dodgingIdx");
             // condition is met within dodge roll keypress handler
             if (this.dodging) {
                 this.invincible = true;
@@ -108,6 +114,7 @@ export default class Player {
     keyDown(e) {
         this.idle = false;
         this.keys[e.code] = true;
+        // console.log(this.frameIdx)
     }
 
     keyUp(e) {
@@ -117,6 +124,11 @@ export default class Player {
         // this.jumping = false;
         this.dodging = false;
         this.idle = true;
+        this.actionIndices["movementIdx"] = 0;
+        this.actionIndices["idleIdx"] = 0;
+        this.actionIndices["attackingIdx"] = 0;
+        this.actionIndices["dodgingIdx"] = 0;
+        this.actionIndices["dyingIdx"] = 0;
     }
 
     move() {
@@ -149,14 +161,14 @@ export default class Player {
         // this prevents rolling in place for infinite dodgerolls
         if ((this.keys["ArrowRight"] && this.keys["KeyD"] || (this.keys["ArrowRight"] && this.keys["KeyA"]) ) &&
          (this.x < 670) && (this.x > -70) && this.canDodge) {
-
+            // console.log(this.frameIdx)
             setTimeout(() => {
                 // invincibility from dodging enabled for 1 second
                 this.canDodge = false;
                 setTimeout(() => {
-                    // cannot dodge again for 1 seconds after
+                    // cannot dodge again for 0.2 seconds after
                     this.canDodge = true;
-                }, 2000);
+                }, 1200);
             }, 1000);
 
             this.moving = false;
@@ -192,16 +204,16 @@ export default class Player {
     //     }
     // }
 
-    handleFrames(action, framesL, framesR) {
+    handleFrames(action, framesL, framesR, idxType) {
         if (action) {
             let framesArr = framesL;
             if (this.direction === "right") framesArr = framesR;
-            if (this.frameIdx < framesArr.length) {
-                this.frameX = framesArr[this.frameIdx][0];
-                this.frameY = framesArr[this.frameIdx][1];
-                this.frameIdx++;
+            if (this.actionIndices[idxType] < framesArr.length) {
+                this.frameX = framesArr[this.actionIndices[idxType]][0];
+                this.frameY = framesArr[this.actionIndices[idxType]][1];
+                this.actionIndices[idxType]++;
             } else {
-                this.frameIdx = 0;
+                this.actionIndices[idxType] = 0;
             }
         }
     }
@@ -218,10 +230,10 @@ export default class Player {
     handleDyingFrames() {
         let framesArr = this.dyingFramesL;
         if (this.direction === "right") framesArr = this.dyingFramesR;
-        if (this.frameIdx < framesArr.length) {
-            this.frameX = framesArr[this.frameIdx][0];
-            this.frameY = framesArr[this.frameIdx][1];
-            this.frameIdx++;
+        if (this.actionIndices["dyingIdx"] < framesArr.length) {
+            this.frameX = framesArr[this.actionIndices["dyingIdx"]][0];
+            this.frameY = framesArr[this.actionIndices["dyingIdx"]][1];
+            this.actionIndices["dyingIdx"]++;
         } else {
             const that = this;
             // dead body remains displayed for brief moment after death
