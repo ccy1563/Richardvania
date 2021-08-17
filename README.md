@@ -6,6 +6,12 @@
 * You play as a swordsman Old Richard that was imprisoned by Demon Lord Anthony. After a decade of imprisonment, Old Richard escaped and now his sole mission is to slay Anthony with his big sword.
 
 ## Functionality & MVPs
+INSTRUCTIONS
+* A: move left
+* D: move right
+* Left Arrow: Attack
+* A/D + Right Arrow: Dodge-roll towards direction. Invinciblity applied for 1 second. Cooldown for 2 seconds.
+
 In Edgelord, users will be able to:
 * Move player character left, right, and be able to jump.
 * Attack enemy character to accumulate points.

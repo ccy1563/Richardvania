@@ -1,5 +1,5 @@
-import playerRight from "../assets/HeroRight.png"
-import playerLeft from "../assets/HeroLeft.png"
+import playerRight from "../assets/hero/HeroRight.png"
+import playerLeft from "../assets/hero/HeroLeft.png"
 import HealthBar from "../scripts/bar.js"
 
 export default class Player {
@@ -16,18 +16,61 @@ export default class Player {
         this.playerSprite = new Image();
         this.playerSprite.src = playerRight;
         
-        this.action = false;
-        this.jumping = false;
+        // this.jumping = false;
         this.dodging = false;
         this.attacking = false;
-        this.moving = true
+        this.moving = false;
+        this.idle = true;
+        
+        this.canDodge = true;
+        this.invincible = false;
 
-        this.healthBar = new HealthBar(20,20,130,10,100,"green");
-        this.healthPoints = 130;
+        // this.startTime = 0;
+        // this.now = 0;
+        // this.then = 0;
+        // this.elapsed = 0;
 
-        this.dyingFramesL = [[5, 7], [4, 7], [3, 7], [2, 7], [1, 7], [0, 7]];
-        this.dyingFramesR = [[0, 7], [1, 7], [2, 7], [3, 7], [4, 7], [5, 7]];
+        this.healthBar = new HealthBar(20,20,150,10,100,"green");
+        this.healthPoints = 150;
 
+        this.frameIdx = 0;
+        this.idleFramesL = [
+            [5, 0], [4, 0], [3, 0], 
+            [2, 0], [1, 0], [0, 0]];
+        this.idleFramesR = [
+            [0, 0], [1, 0], [2, 0], 
+            [3, 0], [4, 0], [5, 0]];
+        this.movementFramesL = [
+            [5, 1], [4, 1], [3, 1], [2, 1], [1, 1],
+            [0, 1], [5, 2], [4, 2], [3, 2], [2, 2]];
+        this.movementFramesR = [
+            [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], 
+            [5, 1], [0, 2], [1, 2], [2, 2], [3, 2]];
+        this.dyingFramesL = [
+            [5, 7], [4, 7], [3, 7], [2, 7], [1, 7], 
+            [0, 7], [5, 8], [4, 8], [3, 8], [2, 8], [1, 8]];
+        this.dyingFramesR = [
+            [0, 7], [1, 7], [2, 7], [3, 7], [4, 7], 
+            [5, 7], [0, 8], [1, 8], [2, 8], [3, 8], [4, 8]];
+        this.attackFramesL = [
+            [5, 5], [4, 5], [3, 5], [2, 5], [1, 5], 
+            [0, 5], [5, 4], [4, 4], [3, 4], [2, 4], 
+            [1, 4], [0, 4], [5, 3], [4, 3], [3, 3], 
+            [2, 3], [1, 3], [0, 3], [5, 2]];
+        this.attackFramesR = [
+            [5, 2], [0, 3], [1, 3], [2, 3], [3, 3], 
+            [4, 3], [5, 3], [0, 4], [1, 4], [2, 4], 
+            [3, 4], [4, 4], [5, 4], [0, 5], [1, 5], 
+            [2, 5], [3, 5], [4, 5], [5, 5]];
+
+        this.dodgeIdx = 0;
+        this.dodgeFramesL = [
+            [0, 9], [5, 10], [4, 10], [3, 10], [2, 10],
+            [1, 10], [0, 10], [5, 11], [4, 11], [3, 11]];
+        this.dodgeFramesR = [
+            [5, 9], [0, 10], [1, 10], [2, 10], [3, 10], 
+            [4, 10], [5, 10], [0, 11], [1, 11], [2, 11]];
+            
         this.keys = [];
     }
 
@@ -35,28 +78,48 @@ export default class Player {
         function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
             ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
         }
-        drawSprite(this.playerSprite, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width * 1.5, this.height * 1.5);
+        drawSprite(
+            this.playerSprite, 
+            this.width * this.frameX, 
+            this.height * this.frameY, 
+            this.width, 
+            this.height, 
+            this.x, 
+            this.y, 
+            this.width * 1.5, 
+            this.height * 1.5);
+
         this.healthBar.animate(ctx);
         
         if (this.dying === true) {
-            this.handleDyingAnimation();
+            this.handleDyingFrames();
         } else {
             this.move();
-            this.handleFrames();
+            this.handleFrames(this.moving, this.movementFramesL, this.movementFramesR);
+            this.handleFrames(this.idle, this.idleFramesL, this.idleFramesR);
+            this.handleFrames(this.attacking, this.attackFramesL, this.attackFramesR);
+            
+            this.handleFrames(this.dodging, this.dodgeFramesL, this.dodgeFramesR);
+            if (this.dodging) {
+                this.invincible = true;
+            } else {
+                this.invincible = false;
+            }
         }
     }
 
     keyDown(e) {
+        this.idle = false;
         this.keys[e.code] = true;
     }
 
     keyUp(e) {
         delete this.keys[e.code];
-        this.frameY = 0;
         this.attacking = false;
         this.moving = false;
-        this.jumping = false;
+        // this.jumping = false;
         this.dodging = false;
+        this.idle = true;
     }
 
     move() {
@@ -64,76 +127,87 @@ export default class Player {
             this.playerSprite.src = playerRight;
             this.direction = "right";
             this.moving = true;
+            this.idle = false;
+            this.dodging = false;
+            this.attacking = false;
             this.x += this.speed;
-            this.frameY = 1;
-            
         }
         if (this.keys["KeyA"] && this.x > -70) { // left
             this.playerSprite.src = playerLeft;
             this.direction = "left";
             this.moving = true;
+            this.idle = false;
+            this.dodging = false;
+            this.attacking = false;
             this.x -= this.speed
-            this.frameY = 1
-        }
-        if (this.keys["KeyW"] && this.jumping === false) {
-            this.frameY = 9;
-            this.y_velocity -= 5;
-            this.jumping = true;
         }
         if (this.keys["ArrowLeft"]) {
+            this.moving = false;
+            this.idle = false;
+            this.dodging = false;
             this.attacking = true;
-            this.frameY = 3;
-            // this.moving = true;
         }
-        if (this.keys["ArrowUp"]) {
-            this.attacking = true;
-            this.frameY = 4;
-            // this.moving = true;
-        }
-        if (this.keys["ArrowRight"] && this.playerSprite.src === playerRight && this.x < 670) {
-            for (let i = 0; i < 10; i++) {
-                this.keys["ArrowRight"];
-            }
-            // console.log()
-            this.dodging = true
-            this.frameY = 10;
-            this.x += 10;
-        }
-        // (&& canRoll === true)
-        if (this.keys["ArrowRight"] && this.playerSprite.src === playerLeft && this.x > -70) {
-            // const that = this;
-            // this.canRoll = false;
-            // this.invincible = true;
-            // // do the dodgeroll animation, might need time
-            // setTimeout(function() {
-            //     this.canRoll = true;
-            // }, 3000);
-            this.dodging = true
-            this.frameY = 10;
-            this.x -= 10;
-        } 
-        // if (this.keys["p"]) {
-            
-        // }
-    }
-    
-    handleFrames() {
-        if (this.playerSprite.src === playerRight) {
-            if (this.frameX < 5) {
-                this.frameX++;
-            } else {
-                this.frameX = 0;
-            }
-        } 
-        if (this.playerSprite.src === playerLeft) {
-            if (this.frameX >= 1) {
-                this.frameX--;
-            } else {
-                this.frameX = 5;
-            }
+
+        // can only dodgeroll when player presses (direction key + dodgeroll key)
+        // this prevents rolling in place for infinite dodgerolls
+        if ((this.keys["ArrowRight"] && this.keys["KeyD"] || (this.keys["ArrowRight"] && this.keys["KeyA"]) ) &&
+         (this.x < 670) && (this.x > -70) && this.canDodge) {
+
+            setTimeout(() => {
+                // invincibility from dodging enabled for 1 second
+                this.canDodge = false;
+                setTimeout(() => {
+                    // cannot dodge again for 2 seconds after
+                    this.canDodge = true;
+                }, 3000);
+            }, 1000);
+
+            this.moving = false;
+            this.idle = false;
+            this.dodging = true;
+            this.attacking = false;
         }
     }
 
+    // handleDodgingFrames() {
+    //     if (this.dodging) {
+    //         let framesArr = this.dodgeFramesR;
+    //         if (this.direction === "left") framesArr = this.dodgeFramesL;
+    //         if (this.dodgeIdx < framesArr.length) {
+    //             if (this.direction === "left") {
+    //                 this.x -= 10;
+    //             } else {
+    //                 this.x += 10;
+    //             }
+    //             this.frameX = framesArr[this.dodgeIdx][0];
+    //             this.frameY = framesArr[this.dodgeIdx][1];
+    //             this.dodgeIdx++;
+    //         } else {
+    //             this.dodging = false;
+    //             this.invincible = false;
+    //             this.dodgeIdx = 0;
+    //             const that = this;
+    //             setTimeout(function () {
+    //                 that.canDodge = true;
+    //             }, 2000);
+    //         }
+    //     }
+    // }
+
+    handleFrames(action, framesL, framesR) {
+        if (action) {
+            let framesArr = framesL;
+            if (this.direction === "right") framesArr = framesR;
+            if (this.frameIdx < framesArr.length) {
+                this.frameX = framesArr[this.frameIdx][0];
+                this.frameY = framesArr[this.frameIdx][1];
+                this.frameIdx++;
+            } else {
+                this.frameIdx = 0;
+            }
+        }
+    }
+    
     coordinates() {
         return [this.x, this.y];
     }
@@ -143,43 +217,31 @@ export default class Player {
         this.healthBar.takeDamage(dmg)
     }
 
-    handleDyingAnimation() {
-        this.attacking = false;
-        this.moving = false;
-        if (this.healthPoints < 0) {
-            // this.dying = true;
-            if (this.direction === "right") {
-                this.handleDyingFrames(this.dying, this.dyingFramesR, this.frameIdx);
-            } else {
-                this.handleDyingFrames(this.dying, this.dyingFramesL, this.frameIdx);
-            }
+    handleDyingFrames() {
+        let framesArr = this.dyingFramesL;
+        if (this.direction === "right") framesArr = this.dyingFramesR;
+        if (this.frameIdx < framesArr.length) {
+            this.frameX = framesArr[this.frameIdx][0];
+            this.frameY = framesArr[this.frameIdx][1];
+            this.frameIdx++;
+        } else {
+            const that = this;
+            this.frameX = framesArr[framesArr.length - 1][0];
+            this.frameY = framesArr[framesArr.length - 1][1];
+            setTimeout(function () {
+                that.frameX = framesArr[framesArr.length - 1];
+                that.alive = false;
+            }, 3000);
         }
     }
 
-
-    handleDyingFrames(action, framesArr, frameIdx) {
-        const that = this;
-        if (action === true) {
-            if (frameIdx < framesArr.length) {
-                that.frameX = framesArr[frameIdx][0];
-                that.frameY = framesArr[frameIdx][1];
-                that.frameIdx++;
-            } else {
-                that.frameX = framesArr[framesArr.length - 1][0];
-                that.frameY = framesArr[framesArr.length - 1][1];
-                setTimeout(function () {
-                    that.frameX = framesArr[framesArr.length - 1];
-                    // that.dying = false;
-                    // console.log(that.dying);
-                    // that.moving = true;
-                    that.alive = false;
-                    // that.dying = false;
-                }, 3000);
-            }
+    beingAttacked(dmg) {
+        console.log(`inv: ${this.invincible}`)
+        if (!this.invincible) {
+            console.log("player being hit")
+            this.healthPoints -= dmg;
+            this.healthBar.takeDamage(dmg);
         }
-    }
-
-    dead() {
-        this.dying = true;
+        if (this.healthPoints < 0) this.dying = true;
     }
 }

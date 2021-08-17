@@ -13,23 +13,23 @@ export default class Game {
         this.player = new Player();
         this.demon = new Demon();
         this.rogue = new Rogue();
+
         this.fpsInterval = 0;
-        this.then = 0;
         this.startTime = 0;
         this.now = 0;
         this.then = 0;
         this.elapsed = 0;
-
+        
         this.paused = 0;
         this.running = 1;
         this.gameState = this.running;
-        // this.menu = 2;
         this.gameOver = 3;
-
+        // this.menu = 2;
+        
         this.keys = [];
+        this.currentLevel = 0;
         this.start(15);
         this.eventListener();
-        this.numOfAttacks = [0];
 
     }
 
@@ -74,7 +74,11 @@ export default class Game {
     togglePause() {
         if (this.gameState === this.paused) {
             this.gameState = this.running;
-            this.animate();
+            if (this.currentLevel === 0) {
+                this.animateAbominationLevel();
+            } else {
+                this.animateRogueLevel();
+            }
         } else {
             this.gameState = this.paused;
         }
@@ -113,19 +117,20 @@ export default class Game {
         this.ctx.fillText("Press R to redeem yourself.", this.dimensions.width / 2, (this.dimensions.height / 2) + 50);
     }
     
-    animate() {
+    animateAbominationLevel() {
         // checking to see if the game is paused
         if (this.gameState === this.paused) {
             this.pauseScreen();
             return;
         }
 
+        // checking to see if the game is over
         if (this.gameState === this.gameOver) {
             this.gameOverScreen();
             return;
         }
 
-        requestAnimationFrame(this.animate.bind(this));
+        requestAnimationFrame(this.animateAbominationLevel.bind(this));
 
         this.now = Date.now();
         this.elapsed = this.now - this.then;
@@ -136,10 +141,9 @@ export default class Game {
             this.level.animate(this.ctx, this.canvas);
             this.player.animate(this.ctx);
             if (this.demon.alive) {
-                // console.log(this.demon.alive)
                 this.demon.animate(this.ctx, this.player.coordinates());
             }
-            this.registerAttacks();
+            this.registerAttacks1();
         }
     }
 
@@ -147,95 +151,67 @@ export default class Game {
         this.fpsInterval = 1000 / fps;
         this.then = Date.now();
         this.startTime = this.then;
-        // this.animate();
-        this.animate();
+
+        if (this.currentLevel === 0) {
+            this.animateAbominationLevel();
+        } else {
+            this.animateRogueLevel();
+        }
     }
 
-    collision(player, demon, x1, x2) {
-        if (player.x + x1 > demon.x + demon.width ||
-            player.x + player.width - x2 < demon.x ||
-            player.y > demon.y + demon.height ||
-            player.y + player.height < demon.y) {
+    // x1, x2 uh i dont remember what these values are for, just trial and error
+    collision(player, enemy, x1, x2) {
+        if (player.x + x1 > enemy.x + enemy.width ||
+            player.x + player.width - x2 < enemy.x ||
+            player.y > enemy.y + enemy.height ||
+            player.y + player.height < enemy.y) {
             return false;
         } else {
             return true;
         }
     }
 
-    registerAttacks() {
+    // registering attacks between player and demon
+    registerAttacks1() {
         if (this.collision(this.player, this.demon, 30, 60)) {
-            // demon spamming attack all the time, wtf how to make it stop
-            if (this.numOfAttacks.length > 0) { // bro how is this even working lmao
-                this.numOfAttacks.shift();
-                this.demon.attack();
-            } else {
-                const that = this;
-                setTimeout(function() {
-                    that.numOfAttacks.push(0);
-                }, 4000);
-            }
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.demon.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.demon.x < this.player.x)) {
                 this.demon.beingAttacked(5);
-                if (this.demon.healthPoints < 0) {
-                    this.demon.dead();
-                }
             }
             if ((this.demon.attacking && this.demon.direction === "right" && this.player.x > this.demon.x) || (this.demon.attacking && this.demon.direction === "left" && this.player.x - 30 < this.demon.x)) {
                 // lmao being on the right side hurts player even with demon attacking wut
                 // yolo bug fix
                 if (this.demon.alive && !this.demon.dying) {
                     this.player.beingAttacked(5);
-                }
-                if (this.player.healthPoints < 0) {
-                    this.player.dead();
-                    setTimeout(() => {
-                        this.gameState = this.gameOver;
-                    }, 3000);
+                    if (this.player.dying) {
+                        setTimeout(() => {
+                            this.gameState = this.gameOver;
+                        }, 3000);
+                    }
                 }
             }
         }
     }
 
+    animateRogueLevel() {
+        requestAnimationFrame(this.animateRogueLevel.bind(this));
 
-    /////////////////////////////////////////////////////////////////////////////////
+        this.now = Date.now();
+        this.elapsed = this.now - this.then;
 
+        if (this.elapsed > this.fpsInterval) {
+            this.then = this.now - (this.elapsed % this.fpsInterval);
+            this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
+            this.level.animate(this.ctx, this.canvas);
+            this.player.animate(this.ctx);
 
+            if (this.rogue.alive) {
+                this.rogue.animate(this.ctx, this.player.coordinates());
+            }
+            this.registerAttacks2();
+        }
+    }
 
-
-
-
-    //////////////////////////////////////////////////////////////////////////
-
-    // animate2() {
-    //     requestAnimationFrame(this.animate2.bind(this));
-
-    //     this.now = Date.now();
-    //     this.elapsed = this.now - this.then;
-
-    //     if (this.elapsed > this.fpsInterval) {
-    //         this.then = this.now - (this.elapsed % this.fpsInterval);
-    //         this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
-    //         this.level.animate(this.ctx, this.canvas);
-    //         this.player.animate(this.ctx);
-
-    //         if (this.rogue.alive) {
-    //             this.rogue.animate(this.ctx, this.player.coordinates());
-    //         }
-    //         this.registerAttacks2();
-    //     }
-    // }
-
-    // registerAttacks2() {
-    //     if (this.numOfAttacks.length > 0) { // bro how is this even working lmao
-    //         this.numOfAttacks.shift();
-    //         // console.log("ATTACKING")
-    //         this.rogue.attack();
-    //     } else {
-    //         const that = this;
-    //         setTimeout(function () {
-    //             that.numOfAttacks.push(0);
-    //         }, 4000);
-    //     }
-    // }
+    registerAttacks2() {
+    }
 }

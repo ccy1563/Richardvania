@@ -76,8 +76,8 @@ export default class Rogue {
             this.frameY = framesArr[this.frameIdx][1];
             this.frameIdx++;
         } else {
-            this.attacking = false;
             this.frameIdx = 0;
+            this.attacking = false;
             this.idle = true;
         }
     }

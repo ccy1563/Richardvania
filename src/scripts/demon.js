@@ -1,5 +1,5 @@
-import playerRight from "../assets/AbominationRight.jpg"
-import playerLeft from "../assets/AbominationLeft.jpg"
+import playerRight from "../assets/abomination/AbominationRight.jpg"
+import playerLeft from "../assets/abomination/AbominationLeft.jpg"
 import HealthBar from "../scripts/bar.js"
 
 export default class Demon {
@@ -26,12 +26,26 @@ export default class Demon {
         
         this.direction = "left";
         this.frameIdx = 0;
-        this.movementFramesL = [[0, 3], [1, 3], [2, 3], [3, 3]];
-        this.movementFramesR = [[5, 3], [4, 3], [3, 3], [2, 3]];
-        this.attackFramesL = [[0, 2], [1, 2], [2, 2], [3, 2], [4, 2]];
-        this.attackFramesR = [[1, 2], [2, 2], [3, 2], [4, 2], [5, 2]];
-        this.dyingFramesL = [[5, 6], [4, 6], [3, 6], [2, 6], [1, 6], [0, 6]];
-        this.dyingFramesR = [[0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6]];
+        this.movementFramesL = [
+            [3, 3], [2, 3], [1, 3], [0, 3], 
+            [5, 4], [4, 4], [3, 4], [2, 4]];
+        this.movementFramesR = [
+            [2, 3], [3, 3], [4, 3], [5, 3], 
+            [0, 4], [1, 4], [2, 4], [3, 4]];
+        this.attackFramesL = [
+            [1, 1], [0, 1], [5, 2], [4, 2], [3, 2], 
+            [2, 2], [1, 2], [0, 2], [5, 3], [4, 3]];
+        this.attackFramesR = [
+            [4, 1],[4, 2], [0, 2], [1, 2], [2, 2], 
+            [3, 2], [4, 2], [5, 2], [0, 3], [1, 3]];
+        this.dyingFramesL = [
+            [0, 5], [5, 6], [4, 6], 
+            [3, 6], [2, 6], [1, 6], [0, 6]];
+        this.dyingFramesR = [
+            [5, 5], [0, 6], [1, 6], 
+            [2, 6], [3, 6], [4, 6], [5, 6]];
+
+        this.numOfAttacks = 1;
 
         this.keys = [];
     }
@@ -40,28 +54,77 @@ export default class Demon {
         function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
             ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
         }
-        drawSprite(this.playerSprite, this.width * this.frameX, this.height * this.frameY, this.width, this.height, this.x, this.y, this.width * 1.5, this.height * 1.5);
+
+        drawSprite(
+            this.playerSprite, 
+            this.width * this.frameX, 
+            this.height * this.frameY, 
+            this.width, 
+            this.height, 
+            this.x, 
+            this.y, 
+            this.width * 1.5, 
+            this.height * 1.5);
+
         this.move(coordinates);
         this.healthBar.animate(ctx);
-        
+
         if (this.dying === true) {
-            this.handleDyingAnimation();
+            this.moving = false;
+            this.attacking = false;
+            this.handleDyingFrames();
         } else {
-            if (this.direction === "right") {
-                this.handleFrames(this.moving, this.movementFramesR, this.frameIdx);
-            } else {
-                this.handleFrames(this.moving, this.movementFramesL, this.frameIdx);
+            // one attack per 3 seconds
+            if (this.numOfAttacks > 0) {
+                this.attacking = true;
+                this.moving = false;
+                this.numOfAttacks--;
+                setTimeout(() => {
+                    this.numOfAttacks = 1;
+                }, 2000);
             }
-            this.handleAttackingAnimation();
+            this.handleAttackFrames();
+            this.handleMovementFrames();
+        }
+    }
+
+    handleAttackFrames() {
+        if (this.attacking && !this.moving) {
+            let framesArr = this.attackFramesL;
+            if (this.direction === "right") framesArr = this.attackFramesR;
+            if (this.frameIdx < framesArr.length) {
+                this.frameX = framesArr[this.frameIdx][0];
+                this.frameY = framesArr[this.frameIdx][1];
+                this.frameIdx++;
+            } else {
+                this.attacking = false;
+                this.frameIdx = 0;
+                this.moving = true;
+            }
+        }
+    }
+
+    handleMovementFrames() {
+        if (this.moving && !this.attacking) {
+            let framesArr = this.movementFramesL;
+            if (this.direction === "right") framesArr = this.movementFramesR;
+            if (this.frameIdx < framesArr.length) {
+                this.frameX = framesArr[this.frameIdx][0];
+                this.frameY = framesArr[this.frameIdx][1];
+                this.frameIdx++;
+            } else {
+                this.frameIdx = 0;
+                this.frameX = framesArr[this.frameIdx][0];
+                this.frameY = framesArr[this.frameIdx][1];
+            }
         }
     }
 
     move(coordinates) {
-        if (this.moving === true) {
+        if (this.moving) {
             if (this.x > coordinates[0] ) { // player is leftside
                 if (this.direction !== "left") {
                     this.direction = "left";
-                    // need this to make frames match when switching directions
                     this.movementIdxL = 0;
                 }
                 this.playerSprite.src = playerLeft;
@@ -71,7 +134,6 @@ export default class Demon {
             if (this.x < coordinates[0] -70) { // player is rightside
                 if (this.direction !== "right") {
                     this.direction = "right";
-                    // need this to make frames match when switching directions
                     this.movementIdxR = 0;
                 }
                 this.playerSprite.src = playerRight;
@@ -81,108 +143,28 @@ export default class Demon {
         }
     }
 
-    handleFrames(action, framesArr, frameIdx) {
-        if (action === true) {
-            if (frameIdx < framesArr.length) {
-                this.frameX = framesArr[frameIdx][0];
-                this.frameY = framesArr[frameIdx][1];
-                this.frameIdx++;
-            } else {
-                this.frameIdx = 0;
-            }
+    handleDyingFrames() {
+        let framesArr = this.dyingFramesL;
+        if (this.direction === "right") framesArr = this.dyingFramesR;
+        if (this.frameIdx < framesArr.length) {
+            this.frameX = framesArr[this.frameIdx][0];
+            this.frameY = framesArr[this.frameIdx][1];
+            this.frameIdx++;
+        } else {
+            const that = this;
+            this.frameX = framesArr[framesArr.length-1][0];
+            this.frameY = framesArr[framesArr.length-1][1];
+            setTimeout(function () {
+                that.frameX = framesArr[framesArr.length-1];
+                that.alive = false;
+            }, 3000);
         }
-    }
-
-    handleDyingAnimation() {
-        this.attacking = false;
-        this.moving = false;
-        if (this.healthPoints < 0) {
-            // this.dying = true;
-            if (this.direction === "right") {
-                this.handleDyingFrames(this.dying, this.dyingFramesR, this.frameIdx);
-            } else {
-                this.handleDyingFrames(this.dying, this.dyingFramesL, this.frameIdx);
-            }
-        }
-    }
-
-
-    handleDyingFrames(action, framesArr, frameIdx) {
-        const that = this;
-        if (action === true) {
-            if (frameIdx < framesArr.length) {
-                that.frameX = framesArr[frameIdx][0];
-                that.frameY = framesArr[frameIdx][1];
-                that.frameIdx++;
-            } else {
-                that.frameX = framesArr[framesArr.length - 1][0];
-                that.frameY = framesArr[framesArr.length - 1][1];
-                setTimeout(function () {
-                    that.frameX = framesArr[framesArr.length - 1];
-                    // that.dying = false;
-                    // console.log(that.dying);
-                    // that.moving = true;
-                    that.alive = false;  
-                    // that.dying = false;
-                }, 3000);
-            }
-        }
-
-    }
-
-    handleAttackingAnimation() {
-        const that = this;
-        if (this.attacking === true) {
-            if (this.direction === "right") {
-                that.handleAttackingFrames(this.attacking, this.attackFramesR, this.frameIdx);
-            } else {
-                this.handleAttackingFrames(this.attacking, this.attackFramesL, this.frameIdx);
-            }
-            // this.attacking = false;
-            // this.moving = true;
-        }
-    }
-
-    handleAttackingFrames(action, framesArr, frameIdx) {
-        const that = this;
-        if (action === true) {
-            if (frameIdx < framesArr.length) {
-                that.frameX = framesArr[frameIdx][0];
-                that.frameY = framesArr[frameIdx][1];
-                that.frameIdx++;
-            } else {
-                // that.frameX = framesArr[framesArr.length - 1][0];
-                // that.frameY = framesArr[framesArr.length - 1][1];
-                this.moving = true;
-                this.attacking = false;
-                if (this.direction === "right") {
-                    this.handleFrames(this.moving, this.movementFramesR, this.frameIdx);
-                } else {
-                    this.handleFrames(this.moving, this.movementFramesL, this.frameIdx);
-                }
-                // setTimeout(function () {
-                //     that.attacking = false;
-                //     that.frameX = framesArr[framesArr.length - 1];
-                // }, 800);
-            }
-        }
-    }
-
-    attack() {
-        // const that = this;
-        this.attacking = true;
-        this.moving = false;
-        // setTimeout(function(){
-        //     this.moving = true;
-        // }, 1000);
     }
 
     beingAttacked(dmg) {
+        console.log("demon being hit")
         this.healthPoints -= dmg;
-        this.healthBar.takeDamage(dmg)
-    }
-
-    dead() {
-        this.dying = true;
+        this.healthBar.takeDamage(dmg);
+        if (this.healthPoints < 0) this.dying = true;
     }
 }
