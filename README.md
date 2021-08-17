@@ -10,7 +10,7 @@ INSTRUCTIONS
 * A: move left
 * D: move right
 * Left Arrow: Attack
-* A/D + Right Arrow: Dodge-roll towards direction. Invinciblity applied for 1 second. Cooldown for 2 seconds.
+* A/D + Right Arrow: Dodge-roll towards direction. Invinciblity applied for 1 second. Cooldown for 1 second after.
 
 In Edgelord, users will be able to:
 * Move player character left, right, and be able to jump.

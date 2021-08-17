@@ -157,9 +157,9 @@ export default class Player {
                 // invincibility from dodging enabled for 1 second
                 this.canDodge = false;
                 setTimeout(() => {
-                    // cannot dodge again for 2 seconds after
+                    // cannot dodge again for 1 seconds after
                     this.canDodge = true;
-                }, 3000);
+                }, 2000);
             }, 1000);
 
             this.moving = false;
