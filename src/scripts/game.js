@@ -27,7 +27,7 @@ export default class Game {
         // this.menu = 2;
         
         this.keys = [];
-        this.currentLevel = 0;
+        this.currentLevel = 1;
         this.start(15);
         this.eventListener();
 
@@ -213,5 +213,23 @@ export default class Game {
     }
 
     registerAttacks2() {
+        if (this.collision(this.player, this.demon, 0, 0)) {
+            // player attacking demon
+            if ((this.player.attacking && this.player.direction === "right" && this.rogue.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.rogue.x < this.player.x)) {
+                this.rogue.beingAttacked(5);
+            }
+            if ((this.rogue.attacking && this.rogue.direction === "right" && this.player.x > this.rogue.x) || (this.rogue.attacking && this.rogue.direction === "left" && this.player.x - 30 < this.rogue.x)) {
+                // lmao being on the right side hurts player even with rogue attacking wut
+                // yolo bug fix
+                if (this.rogue.alive && !this.rogue.dying) {
+                    // this.player.beingAttacked(5);
+                    if (this.player.dying) {
+                        setTimeout(() => {
+                            this.gameState = this.gameOver;
+                        }, 3000);
+                    }
+                }
+            }
+        }
     }
 }

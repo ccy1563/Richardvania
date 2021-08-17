@@ -70,11 +70,13 @@ export default class Demon {
         this.healthBar.animate(ctx);
 
         if (this.dying === true) {
+            // when abomination dies, execute death animations
+            // disables all other actions and ends the game once animation ends
             this.moving = false;
             this.attacking = false;
             this.handleDyingFrames();
         } else {
-            // one attack per 3 seconds
+            // one attack per 2 seconds
             if (this.numOfAttacks > 0) {
                 this.attacking = true;
                 this.moving = false;
@@ -122,7 +124,7 @@ export default class Demon {
 
     move(coordinates) {
         if (this.moving) {
-            if (this.x > coordinates[0] ) { // player is leftside
+            if (this.x > coordinates[0] ) {
                 if (this.direction !== "left") {
                     this.direction = "left";
                     this.movementIdxL = 0;
@@ -131,7 +133,7 @@ export default class Demon {
                 this.moving = true;
                 this.x -= this.speed
             }
-            if (this.x < coordinates[0] -70) { // player is rightside
+            if (this.x < coordinates[0] - 70) {
                 if (this.direction !== "right") {
                     this.direction = "right";
                     this.movementIdxR = 0;
@@ -152,6 +154,7 @@ export default class Demon {
             this.frameIdx++;
         } else {
             const that = this;
+            // dead body remains displayed for brief moment after death
             this.frameX = framesArr[framesArr.length-1][0];
             this.frameY = framesArr[framesArr.length-1][1];
             setTimeout(function () {
@@ -162,7 +165,6 @@ export default class Demon {
     }
 
     beingAttacked(dmg) {
-        console.log("demon being hit")
         this.healthPoints -= dmg;
         this.healthBar.takeDamage(dmg);
         if (this.healthPoints < 0) this.dying = true;

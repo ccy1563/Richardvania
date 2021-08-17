@@ -25,11 +25,6 @@ export default class Player {
         this.canDodge = true;
         this.invincible = false;
 
-        // this.startTime = 0;
-        // this.now = 0;
-        // this.then = 0;
-        // this.elapsed = 0;
-
         this.healthBar = new HealthBar(20,20,150,10,100,"green");
         this.healthPoints = 150;
 
@@ -63,7 +58,7 @@ export default class Player {
             [3, 4], [4, 4], [5, 4], [0, 5], [1, 5], 
             [2, 5], [3, 5], [4, 5], [5, 5]];
 
-        this.dodgeIdx = 0;
+        // this.dodgeIdx = 0;
         this.dodgeFramesL = [
             [0, 9], [5, 10], [4, 10], [3, 10], [2, 10],
             [1, 10], [0, 10], [5, 11], [4, 11], [3, 11]];
@@ -92,14 +87,16 @@ export default class Player {
         this.healthBar.animate(ctx);
         
         if (this.dying === true) {
+            // when player character dies, execute death animations
+            // disables all other actions and ends the game once animation ends
             this.handleDyingFrames();
         } else {
             this.move();
             this.handleFrames(this.moving, this.movementFramesL, this.movementFramesR);
             this.handleFrames(this.idle, this.idleFramesL, this.idleFramesR);
             this.handleFrames(this.attacking, this.attackFramesL, this.attackFramesR);
-            
             this.handleFrames(this.dodging, this.dodgeFramesL, this.dodgeFramesR);
+            // condition is met within dodge roll keypress handler
             if (this.dodging) {
                 this.invincible = true;
             } else {
@@ -123,7 +120,7 @@ export default class Player {
     }
 
     move() {
-        if (this.keys["KeyD"] && this.x < 670) {// right
+        if (this.keys["KeyD"] && this.x < 670) { // right
             this.playerSprite.src = playerRight;
             this.direction = "right";
             this.moving = true;
@@ -169,6 +166,7 @@ export default class Player {
         }
     }
 
+    // attempt at enabling invincibility only during dodge roll animation frames
     // handleDodgingFrames() {
     //     if (this.dodging) {
     //         let framesArr = this.dodgeFramesR;
@@ -226,6 +224,7 @@ export default class Player {
             this.frameIdx++;
         } else {
             const that = this;
+            // dead body remains displayed for brief moment after death
             this.frameX = framesArr[framesArr.length - 1][0];
             this.frameY = framesArr[framesArr.length - 1][1];
             setTimeout(function () {
