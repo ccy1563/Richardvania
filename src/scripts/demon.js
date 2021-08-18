@@ -5,7 +5,7 @@ import HealthBar from "../scripts/bar.js"
 export default class Demon {
     constructor() {
         this.x = 375;
-        this.y = 185;
+        this.y = 175;
         this.width = 180;
         this.height = 180,
         this.frameX = 0;
@@ -109,8 +109,8 @@ export default class Demon {
                 this.actionIndices["attackingIdx"]++;
             } else {
                 this.attacking = false;
-                this.actionIndices["attackingIdx"] = 0;
                 this.moving = true;
+                this.actionIndices["attackingIdx"] = 0;
             }
         }
     }
@@ -125,8 +125,6 @@ export default class Demon {
                 this.actionIndices["movementIdx"]++;
             } else {
                 this.actionIndices["movementIdx"] = 0;
-                this.frameX = framesArr[this.actionIndices["movementIdx"]][0];
-                this.frameY = framesArr[this.actionIndices["movementIdx"]][1];
             }
         }
     }
@@ -163,11 +161,7 @@ export default class Demon {
             this.actionIndices["dyingIdx"]++;
         } else {
             const that = this;
-            // dead body remains displayed for brief moment after death
-            this.frameX = framesArr[framesArr.length-1][0];
-            this.frameY = framesArr[framesArr.length-1][1];
             setTimeout(function () {
-                that.frameX = framesArr[framesArr.length-1];
                 that.alive = false;
             }, 3000);
         }

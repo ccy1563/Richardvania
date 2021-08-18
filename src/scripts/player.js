@@ -5,7 +5,7 @@ import HealthBar from "../scripts/bar.js"
 export default class Player {
     constructor() {
         this.x = 0;
-        this.y = 348;
+        this.y = 330;
         this.width = 130;
         this.height = 72,
         this.frameX = 0;
@@ -25,8 +25,8 @@ export default class Player {
         this.canDodge = true;
         this.invincible = false;
 
-        this.healthBar = new HealthBar(20,20,500,10,100,"green");
-        this.healthPoints = 500;
+        this.healthBar = new HealthBar(20,20,200,10,100,"green");
+        this.healthPoints = 200;
 
         // need this so that one action animation doesn't interfere with other action animations
         this.actionIndices = {
@@ -128,11 +128,10 @@ export default class Player {
         this.actionIndices["idleIdx"] = 0;
         this.actionIndices["attackingIdx"] = 0;
         this.actionIndices["dodgingIdx"] = 0;
-        this.actionIndices["dyingIdx"] = 0;
     }
 
     move() {
-        if (this.keys["KeyD"] && this.x < 670) { // right
+        if (this.keys["KeyD"] && this.x < 670 && !this.attacking) { // right
             this.playerSprite.src = playerRight;
             this.direction = "right";
             this.moving = true;
@@ -141,7 +140,7 @@ export default class Player {
             this.attacking = false;
             this.x += this.speed;
         }
-        if (this.keys["KeyA"] && this.x > -70) { // left
+        if (this.keys["KeyA"] && this.x > -70 && !this.attacking) { // left
             this.playerSprite.src = playerLeft;
             this.direction = "left";
             this.moving = true;
@@ -150,7 +149,7 @@ export default class Player {
             this.attacking = false;
             this.x -= this.speed
         }
-        if (this.keys["ArrowLeft"]) {
+        if (this.keys["ArrowLeft"] && !this.attacking) {
             this.moving = false;
             this.idle = false;
             this.dodging = false;
@@ -160,7 +159,7 @@ export default class Player {
         // can only dodgeroll when player presses (direction key + dodgeroll key)
         // this prevents rolling in place for infinite dodgerolls
         if ((this.keys["ArrowRight"] && this.keys["KeyD"] || (this.keys["ArrowRight"] && this.keys["KeyA"]) ) &&
-         (this.x < 670) && (this.x > -70) && this.canDodge) {
+         (this.x < 670) && (this.x > -70) && this.canDodge && !this.attacking) {
             // console.log(this.frameIdx)
             setTimeout(() => {
                 // invincibility from dodging enabled for 1 second
@@ -209,21 +208,16 @@ export default class Player {
             this.frameY = framesArr[this.actionIndices["dyingIdx"]][1];
             this.actionIndices["dyingIdx"]++;
         } else {
+            console.log("dying")
             const that = this;
-            // dead body remains displayed for brief moment after death
-            this.frameX = framesArr[framesArr.length - 1][0];
-            this.frameY = framesArr[framesArr.length - 1][1];
             setTimeout(function () {
-                that.frameX = framesArr[framesArr.length - 1];
                 that.alive = false;
             }, 3000);
         }
     }
 
     beingAttacked(dmg) {
-        // console.log(`inv: ${this.invincible}`)
         if (!this.invincible) {
-            // console.log("player being hit")
             this.healthPoints -= dmg;
             this.healthBar.takeDamage(dmg);
         }

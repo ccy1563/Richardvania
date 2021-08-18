@@ -1,4 +1,4 @@
-import village from "../assets/inferno_village.jpg"
+import village from "../assets/background/CemeteryScreen.png"
 
 export default class Level {
     constructor(dimensions) {

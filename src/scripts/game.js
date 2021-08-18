@@ -14,7 +14,6 @@ export default class Game {
         this.player = new Player();
         this.demon = new Demon();
         this.rogue = new Rogue();
-        // this.shuriken = new Shuriken(100, 100, 20);
 
         this.fpsInterval = 0;
         this.startTime = 0;
@@ -32,13 +31,13 @@ export default class Game {
         this.currentLevel = 0;
         this.start(15);
         this.eventListener();
-
     }
 
     restart() {
         this.level = new Level(this.dimensions);
         this.player = new Player();
         this.demon = new Demon();
+        this.rogue = new Rogue();
         this.gameState = this.running;
         this.start(15);
     }
@@ -76,11 +75,7 @@ export default class Game {
     togglePause() {
         if (this.gameState === this.paused) {
             this.gameState = this.running;
-            if (this.currentLevel === 0) {
-                this.animateAbominationLevel();
-            } else {
-                this.animateRogueLevel();
-            }
+            this.animate();
         } else {
             this.gameState = this.paused;
         }
@@ -101,25 +96,29 @@ export default class Game {
     }
 
     gameOverScreen() {
-        this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
-        this.ctx.fillStyle = "rgba(0,0,0,0.5)";
-        this.ctx.fill();
-        this.ctx.font = "100px Papyrus";
-        // this.ctx.fillStyle = "red";
-        this.ctx.fillStyle = 'black';
-        this.ctx.strokeStyle = 'red';
-        this.ctx.textAlign = "center";
-        this.ctx.fillText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
-        this.ctx.strokeText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
+        setTimeout(() => {
+            this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
+            this.ctx.fillStyle = "rgba(0,0,0,0.5)";
+            this.ctx.fill();
+            this.ctx.font = "100px Papyrus";
+            // this.ctx.fillStyle = "red";
+            this.ctx.fillStyle = 'black';
+            this.ctx.strokeStyle = 'red';
+            this.ctx.textAlign = "center";
+            this.ctx.fillText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
+            this.ctx.strokeText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
 
-        this.ctx.font = "15px Papyrus";
-        this.ctx.fillStyle = "red";
-        this.ctx.textAlign = "center";
+            this.ctx.font = "15px Papyrus";
+            this.ctx.fillStyle = "red";
+            this.ctx.textAlign = "center";
         // this.ctx.fillText('lol, press R to restart, scrub.', this.dimensions.width / 2, (this.dimensions.height / 2) + 50);
-        this.ctx.fillText("Press R to redeem yourself.", this.dimensions.width / 2, (this.dimensions.height / 2) + 50);
+        }, 1000);
+        setTimeout(() => {
+            this.ctx.fillText("Press R to redeem yourself.", this.dimensions.width / 2, (this.dimensions.height / 2) + 50);
+        }, 3000);
     }
     
-    animateAbominationLevel() {
+    animate() {
         // checking to see if the game is paused
         if (this.gameState === this.paused) {
             this.pauseScreen();
@@ -130,7 +129,6 @@ export default class Game {
             this.gameOverScreen();
             return;
         }        
-        requestAnimationFrame(this.animateAbominationLevel.bind(this));
         this.now = Date.now();
         this.elapsed = this.now - this.then;
         if (this.elapsed > this.fpsInterval) {
@@ -142,18 +140,14 @@ export default class Game {
             if (this.demon.alive) this.demon.animate(this.ctx, this.player.coordinates());
             if (this.rogue.alive) this.rogue.animate(this.ctx, this.player.coordinates());
         }
+        requestAnimationFrame(this.animate.bind(this));
     }
 
     start(fps) {
         this.fpsInterval = 1000 / fps;
         this.then = Date.now();
         this.startTime = this.then;
-
-        if (this.currentLevel === 0) {
-            this.animateAbominationLevel();
-        } else {
-            this.animateRogueLevel();
-        }
+        this.animate();
     }
 
     collision(player, enemy, x1, x2) {
@@ -179,29 +173,24 @@ export default class Game {
                 // yolo bug fix
                 if (this.demon.alive && !this.demon.dying) {
                     this.player.beingAttacked(5);
-                    if (this.player.dying) {
-                        setTimeout(() => {
-                            this.gameState = this.gameOver;
-                        }, 3000);
-                    }
                 }
             }
         }
         if (this.collision(this.player, this.rogue, 0, 0)) {
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.rogue.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.rogue.x < this.player.x)) {
-                this.rogue.beingAttacked(5);
+                this.rogue.beingAttacked(10);
             }
         }
         if (this.rogue.shurikenArr.length > 0) {
             if (this.collision(this.player, this.rogue.shurikenArr[0], 0, 0)) {
-                this.player.beingAttacked(5);
-                if (this.player.dying) {
-                    setTimeout(() => {
-                        this.gameState = this.gameOver;
-                    }, 3000);
-                }
+                this.player.beingAttacked(2);
             }
+        }
+        if (this.player.dying) {
+            setTimeout(() => {
+                this.gameState = this.gameOver;
+            }, 3000);
         }
     }
 }

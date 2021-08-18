@@ -7,13 +7,20 @@
 }
 
 body {
-  background: url("../assets/edgy.png");
+  background: url("../assets/background/cloud.jpeg");
   background-size: cover;
   min-height: 100vh;
 }
 
 .title {
+  display: flex;
   position: relative;
-  top: 10%;
-  left: 44%;
+  left: 40%;
+}
+
+.social {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 15rem;
 }

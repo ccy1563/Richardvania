@@ -10,15 +10,22 @@
 }
 
 body {
-  background: url(bf4e41e977a600d8f06e.png);
+  background: url(a40a37db1df11baf18bb.jpeg);
   background-size: cover;
   min-height: 100vh;
 }
 
 .title {
+  display: flex;
   position: relative;
-  top: 10%;
-  left: 44%;
+  left: 40%;
+}
+
+.social {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-left: 15rem;
 }
 /*!*************************************************************************************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].use[1]!./node_modules/sass-loader/dist/cjs.js!./src/index.scss ***!

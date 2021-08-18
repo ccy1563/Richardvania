@@ -7,7 +7,7 @@ import Shuriken from "../scripts/shuriken.js";
 export default class Rogue {
     constructor() {
         this.x = 690;
-        this.y = 305;
+        this.y = 290;
         this.width = 100;
         this.height = 100,
         this.frameX = 0;
@@ -65,17 +65,19 @@ export default class Rogue {
              [3, 10], [2, 10], [1, 10], [1, 10], [1, 10], [0, 10]];
         this.teleportFramesLPhase2 = [
             [7, 11], [6, 11], [5, 11], [4, 11], 
-            [3, 11], [3, 11], [3, 11], [2, 11], [1, 11], [0, 11]];
+            [3, 11], [3, 11], [3, 11], [2, 11], [1, 11], [0, 11],
+            [7, 10]];
         this.teleportFramesRPhase1 = [
             [0, 10], [1, 10], [2, 10], [3, 10], 
             [4, 10], [5, 10], [6, 10], [6, 10], [6, 10], [7, 10]];
         this.teleportFramesRPhase2 = [
             [0, 11], [1, 11], [2, 11], [3, 11],     
-            [4, 11], [4, 11], [4, 11], [5, 11], [6, 11], [7, 11]];
+            [4, 11], [4, 11], [4, 11], [5, 11], [6, 11], [7, 11],
+            [0, 10]];
 
         this.numOfAttacks = 1;
-        this.currentShuriken = new Shuriken(580, 370, 20, this.direction);
-        this.shurikenArr = [this.currentShuriken];
+        // this.currentShuriken = new Shuriken(580, 370, 20, this.direction);
+        this.shurikenArr = [];
 
         this.keys = [];
     }
@@ -110,18 +112,18 @@ export default class Rogue {
             } else {
                 if (this.direction === "left") {
                     // console.log(this.direction)
-                    this.shurikenArr.push(new Shuriken(580, 370, 20, this.direction)); // in 7 seconds load shuriken to use
+                    this.shurikenArr.push(new Shuriken(580, 350, 20, this.direction)); // in 7 seconds load shuriken to use
                 } else {
-                    this.shurikenArr.push(new Shuriken(70, 370, 20, this.direction)); // in 7 seconds load 
+                    this.shurikenArr.push(new Shuriken(70, 350, 20, this.direction)); // in 7 seconds load 
                 }
             }
         }, 1000);
-        this.handleIdleFrames();
+        // this.handleIdleFrames();
         if (this.thrown) {
             this.shurikenArr[0].animate(ctx)
             if (this.shurikenArr[0].hit()) {
                 this.shurikenArr.shift();
-                this.idle = true;
+                // this.idle = false;
                 this.thrown = false;
                 this.attacking = false;
             }

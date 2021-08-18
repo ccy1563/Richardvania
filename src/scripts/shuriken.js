@@ -68,7 +68,8 @@ export default class Shuriken {
     }
 
     hit() {
-        if (this.x < - 70 || this.x > 670) {
+        if (this.x < 0 || this.x > 670) {
+            this.moving = false;
             return true
         } else {
             return false;
