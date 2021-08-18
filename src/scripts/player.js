@@ -25,8 +25,8 @@ export default class Player {
         this.canDodge = true;
         this.invincible = false;
 
-        this.healthBar = new HealthBar(20,20,150,10,100,"green");
-        this.healthPoints = 150;
+        this.healthBar = new HealthBar(20,20,500,10,100,"green");
+        this.healthPoints = 500;
 
         // need this so that one action animation doesn't interfere with other action animations
         this.actionIndices = {
@@ -166,9 +166,9 @@ export default class Player {
                 // invincibility from dodging enabled for 1 second
                 this.canDodge = false;
                 setTimeout(() => {
-                    // cannot dodge again for 0.2 seconds after
+                    // cannot dodge again for 0.1 seconds after
                     this.canDodge = true;
-                }, 1200);
+                }, 1100);
             }, 1000);
 
             this.moving = false;
@@ -177,32 +177,6 @@ export default class Player {
             this.attacking = false;
         }
     }
-
-    // attempt at enabling invincibility only during dodge roll animation frames
-    // handleDodgingFrames() {
-    //     if (this.dodging) {
-    //         let framesArr = this.dodgeFramesR;
-    //         if (this.direction === "left") framesArr = this.dodgeFramesL;
-    //         if (this.dodgeIdx < framesArr.length) {
-    //             if (this.direction === "left") {
-    //                 this.x -= 10;
-    //             } else {
-    //                 this.x += 10;
-    //             }
-    //             this.frameX = framesArr[this.dodgeIdx][0];
-    //             this.frameY = framesArr[this.dodgeIdx][1];
-    //             this.dodgeIdx++;
-    //         } else {
-    //             this.dodging = false;
-    //             this.invincible = false;
-    //             this.dodgeIdx = 0;
-    //             const that = this;
-    //             setTimeout(function () {
-    //                 that.canDodge = true;
-    //             }, 2000);
-    //         }
-    //     }
-    // }
 
     handleFrames(action, framesL, framesR, idxType) {
         if (action) {
@@ -247,9 +221,9 @@ export default class Player {
     }
 
     beingAttacked(dmg) {
-        console.log(`inv: ${this.invincible}`)
+        // console.log(`inv: ${this.invincible}`)
         if (!this.invincible) {
-            console.log("player being hit")
+            // console.log("player being hit")
             this.healthPoints -= dmg;
             this.healthBar.takeDamage(dmg);
         }

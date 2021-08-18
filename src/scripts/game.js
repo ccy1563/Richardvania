@@ -125,32 +125,22 @@ export default class Game {
             this.pauseScreen();
             return;
         }
-
         // checking to see if the game is over
         if (this.gameState === this.gameOver) {
             this.gameOverScreen();
             return;
-        }
-
+        }        
         requestAnimationFrame(this.animateAbominationLevel.bind(this));
-
         this.now = Date.now();
         this.elapsed = this.now - this.then;
-        
         if (this.elapsed > this.fpsInterval) {
             this.then = this.now - (this.elapsed % this.fpsInterval);
             this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
             this.level.animate(this.ctx, this.canvas);
             this.player.animate(this.ctx);
-            if (this.demon.alive) {
-                this.demon.animate(this.ctx, this.player.coordinates());
-            }
             this.registerAttacks1();
-
-            if (this.rogue.alive) {
-                this.rogue.animate(this.ctx, this.player.coordinates());
-            }
-            this.registerAttacks2();
+            if (this.demon.alive) this.demon.animate(this.ctx, this.player.coordinates());
+            if (this.rogue.alive) this.rogue.animate(this.ctx, this.player.coordinates());
         }
     }
 
@@ -166,7 +156,6 @@ export default class Game {
         }
     }
 
-    // x1, x2 uh i dont remember what these values are for, just trial and error
     collision(player, enemy, x1, x2) {
         if (player.x + x1 > enemy.x + enemy.width ||
             player.x + player.width - x2 < enemy.x ||
@@ -198,43 +187,19 @@ export default class Game {
                 }
             }
         }
-    }
-
-    animateRogueLevel() {
-        requestAnimationFrame(this.animateRogueLevel.bind(this));
-
-        this.now = Date.now();
-        this.elapsed = this.now - this.then;
-
-        if (this.elapsed > this.fpsInterval) {
-            this.then = this.now - (this.elapsed % this.fpsInterval);
-            this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
-            this.level.animate(this.ctx, this.canvas);
-            this.player.animate(this.ctx);
-
-            if (this.rogue.alive) {
-                this.rogue.animate(this.ctx, this.player.coordinates());
-            }
-            this.registerAttacks2();
-        }
-    }
-
-    registerAttacks2() {
         if (this.collision(this.player, this.rogue, 0, 0)) {
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.rogue.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.rogue.x < this.player.x)) {
                 this.rogue.beingAttacked(5);
             }
-            if ((this.rogue.attacking && this.rogue.direction === "right" && this.player.x > this.rogue.x) || (this.rogue.attacking && this.rogue.direction === "left" && this.player.x - 30 < this.rogue.x)) {
-                // lmao being on the right side hurts player even with rogue attacking wut
-                // yolo bug fix
-                if (this.rogue.alive && !this.rogue.dying) {
-                    // this.player.beingAttacked(5);
-                    if (this.player.dying) {
-                        setTimeout(() => {
-                            this.gameState = this.gameOver;
-                        }, 3000);
-                    }
+        }
+        if (this.rogue.shurikenArr.length > 0) {
+            if (this.collision(this.player, this.rogue.shurikenArr[0], 0, 0)) {
+                this.player.beingAttacked(5);
+                if (this.player.dying) {
+                    setTimeout(() => {
+                        this.gameState = this.gameOver;
+                    }, 3000);
                 }
             }
         }

@@ -1,7 +1,7 @@
 # Edgelord
 
 ## Background
-* Edgelord is a game where the player controls a character that can move left, right, and attack.
+* RICHARD is a game where the player controls a character that can move left, right, and attack.
 * The goal is to reach the end of the level while eliminating as many enemies as possible.
 * You play as a swordsman Old Richard that was imprisoned by Demon Lord Anthony. After a decade of imprisonment, Old Richard escaped and now his sole mission is to slay Anthony with his big sword.
 
@@ -12,7 +12,7 @@ INSTRUCTIONS
 * Left Arrow: Attack
 * A/D + Right Arrow: Dodge-roll towards direction. Invinciblity applied for 1 second. Cooldown for 1 second after.
 
-In Edgelord, users will be able to:
+In RICHARD, users will be able to:
 * Move player character left, right, and be able to jump.
 * Attack enemy character to accumulate points.
 * Dodge roll to avoid enemy attacks (pending).

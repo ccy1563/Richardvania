@@ -44,7 +44,8 @@ export default class Shuriken {
 
     move() {
         this.moving = true;
-        // console.log(`shuriken direction ${this.direction}`)
+        this.playerSprite.src = shurikenLeft;
+        if (this.direction === "right") this.playerSprite.src = shurikenRight;
         if (this.direction === "left") {
             this.x -= this.speed;
         } else {

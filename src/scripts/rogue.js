@@ -108,7 +108,6 @@ export default class Rogue {
                 this.attacking = true; // set attacking to true
                 this.idle = false;
             } else {
-
                 if (this.direction === "left") {
                     // console.log(this.direction)
                     this.shurikenArr.push(new Shuriken(580, 370, 20, this.direction)); // in 7 seconds load shuriken to use
@@ -133,14 +132,9 @@ export default class Rogue {
         if (this.teleport1) {
             this.handleTeleportFramesPhase1();
         }
-
         if (this.teleport2) {
             this.handleTeleportFramesPhase2();
         }
-
-        // console.log(`idle: ${this.idle}`)
-        // console.log(`attacking: ${this.attacking}`)
-        // console.log(`shurikenarr: ${this.shurikenArr.length}`)
     }
 
     beingAttacked(dmg) {
@@ -188,6 +182,8 @@ export default class Rogue {
         } else {
             this.invincible = false;
             this.teleport2 = false;
+            // this.idle = false;
+            this.attack = false;
             // this.frameX = framesArr[framesArr.length - 1][0];
             // this.frameY = framesArr[framesArr.length - 1][1];
             this.actionIndices["teleportIdx"] = 0;
