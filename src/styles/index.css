@@ -1,3 +1,13 @@
+@font-face {
+    font-family: 'rubberBuscuit';
+    src: url("../font/express.woff") format("woff");
+}
+
+* {
+    font-family: 'rubberBuscuit';
+    font-size: 15px;
+}
+
 #canvas1 {
   width: 800px;
   height: 500px;
@@ -13,14 +23,22 @@ body {
 }
 
 .title {
-  display: flex;
-  position: relative;
-  left: 40%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .social {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding-left: 15rem;
+  flex-direction: row;
+  justify-content: center;
+  justify-content: space-evenly;
+  padding-top: 25rem;
+}
+
+.instructions li{
+  list-style: none;
+  display: flex;
+  padding-left: 10rem;
+  color: black;
 }

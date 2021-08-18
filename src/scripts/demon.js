@@ -92,7 +92,7 @@ export default class Demon {
                 this.numOfAttacks--;
                 setTimeout(() => {
                     this.numOfAttacks = 1;
-                }, 2000);
+                }, 3000);
             }
             this.handleAttackFrames();
             this.handleMovementFrames();

@@ -11,7 +11,7 @@ export default class Game {
         this.ctx = canvas.getContext("2d");
         this.dimensions = { width: canvas.width, height: canvas.height };
         this.level = new Level(this.dimensions);
-        this.player = new Player();
+        this.player = new Player(this.ctx);
         this.demon = new Demon();
         this.rogue = new Rogue();
 
@@ -23,19 +23,19 @@ export default class Game {
         
         this.paused = 0;
         this.running = 1;
-        this.gameState = this.running;
+        this.gameState = 2;
         this.gameOver = 3;
-        // this.menu = 2;
+        this.menu = 2;
         
         this.keys = [];
-        this.currentLevel = 0;
+        // this.currentLevel = 0;
         this.start(15);
         this.eventListener();
     }
 
     restart() {
         this.level = new Level(this.dimensions);
-        this.player = new Player();
+        this.player = new Player(this.ctx);
         this.demon = new Demon();
         this.rogue = new Rogue();
         this.gameState = this.running;
@@ -69,7 +69,15 @@ export default class Game {
         }
         if (this.keys["KeyR"]) { // restart game
             this.restart();
+        } 
+        if (this.keys["Enter"]) { // exit menu
+            this.exitMenu();
         }
+    }
+
+    exitMenu() {
+        this.gameState = this.running;
+        this.animate();
     }
 
     togglePause() {
@@ -81,6 +89,18 @@ export default class Game {
         }
     }
 
+    titleScreen() {
+        this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
+        // this.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        this.ctx.fill();
+        this.ctx.font = "50px Papyrus";
+        // this.ctx.fillStyle = "red";
+        this.ctx.fillStyle = 'red';
+        this.ctx.strokeStyle = 'red';
+        this.ctx.textAlign = 'start';
+        // this.ctx.fillText('Press "enter" to start', 150, this.dimensions.height / 2);
+    }
+
     pauseScreen() {
         this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
         this.ctx.fillStyle = "rgba(0,0,0,0.5)";
@@ -90,7 +110,6 @@ export default class Game {
         this.ctx.fillStyle = 'black';
         this.ctx.strokeStyle = 'red';
         this.ctx.textAlign = "center";
-        // this.ctx.fillText("Coward.", this.dimensions.width / 2, this.dimensions.height / 2);
         this.ctx.fillText('Coward.', this.dimensions.width / 2, this.dimensions.height / 2);
         this.ctx.strokeText('Coward.', this.dimensions.width / 2, this.dimensions.height / 2);
     }
@@ -105,8 +124,8 @@ export default class Game {
             this.ctx.fillStyle = 'black';
             this.ctx.strokeStyle = 'red';
             this.ctx.textAlign = "center";
-            this.ctx.fillText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
-            this.ctx.strokeText('Damned.', this.dimensions.width / 2, this.dimensions.height / 2);
+            this.ctx.fillText('F.', this.dimensions.width / 2, this.dimensions.height / 2);
+            this.ctx.strokeText('F.', this.dimensions.width / 2, this.dimensions.height / 2);
 
             this.ctx.font = "15px Papyrus";
             this.ctx.fillStyle = "red";
@@ -119,6 +138,10 @@ export default class Game {
     }
     
     animate() {
+        if (this.gameState === this.menu) {
+            this.titleScreen();
+            return
+        }
         // checking to see if the game is paused
         if (this.gameState === this.paused) {
             this.pauseScreen();
@@ -128,19 +151,19 @@ export default class Game {
         if (this.gameState === this.gameOver) {
             this.gameOverScreen();
             return;
-        }        
+        }       
+        requestAnimationFrame(this.animate.bind(this));
         this.now = Date.now();
         this.elapsed = this.now - this.then;
         if (this.elapsed > this.fpsInterval) {
             this.then = this.now - (this.elapsed % this.fpsInterval);
             this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
             this.level.animate(this.ctx, this.canvas);
-            this.player.animate(this.ctx);
-            this.registerAttacks1();
+            this.player.animate();
             if (this.demon.alive) this.demon.animate(this.ctx, this.player.coordinates());
             if (this.rogue.alive) this.rogue.animate(this.ctx, this.player.coordinates());
+            this.registerAttacks1();
         }
-        requestAnimationFrame(this.animate.bind(this));
     }
 
     start(fps) {
@@ -184,7 +207,10 @@ export default class Game {
         }
         if (this.rogue.shurikenArr.length > 0) {
             if (this.collision(this.player, this.rogue.shurikenArr[0], 0, 0)) {
-                this.player.beingAttacked(2);
+                if (this.rogue.alive && !this.rogue.dying) {
+                    console.log("shuriken attking player")
+                    this.player.beingAttacked(2);
+                }
             }
         }
         if (this.player.dying) {
@@ -193,4 +219,4 @@ export default class Game {
             }, 3000);
         }
     }
-}
+} 

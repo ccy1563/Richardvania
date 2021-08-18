@@ -3,7 +3,9 @@ import playerLeft from "../assets/hero/HeroLeft.png"
 import HealthBar from "../scripts/bar.js"
 
 export default class Player {
-    constructor() {
+    constructor(ctx) {
+        this.ctx = ctx;
+
         this.x = 0;
         this.y = 330;
         this.width = 130;
@@ -25,8 +27,8 @@ export default class Player {
         this.canDodge = true;
         this.invincible = false;
 
-        this.healthBar = new HealthBar(20,20,200,10,100,"green");
-        this.healthPoints = 200;
+        this.healthBar = new HealthBar(20,20,300,10,100,"green");
+        this.healthPoints = 300;
 
         // need this so that one action animation doesn't interfere with other action animations
         this.actionIndices = {
@@ -75,11 +77,12 @@ export default class Player {
         this.keys = [];
     }
 
-    animate(ctx) {
-        function drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
-            ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
-        }
-        drawSprite(
+    drawSprite(img, sX, sY, sW, sH, dX, dY, dW, dH) {
+        this.ctx.drawImage(img, sX, sY, sW, sH, dX, dY, dW, dH);
+    }
+
+    animate() {
+        this.drawSprite(
             this.playerSprite, 
             this.width * this.frameX, 
             this.height * this.frameY, 
@@ -90,7 +93,7 @@ export default class Player {
             this.width * 1.5, 
             this.height * 1.5);
 
-        this.healthBar.animate(ctx);
+        this.healthBar.animate(this.ctx);
         
         if (this.dying === true) {
             // when player character dies, execute death animations
@@ -114,7 +117,6 @@ export default class Player {
     keyDown(e) {
         this.idle = false;
         this.keys[e.code] = true;
-        // console.log(this.frameIdx)
     }
 
     keyUp(e) {
@@ -149,7 +151,7 @@ export default class Player {
             this.attacking = false;
             this.x -= this.speed
         }
-        if (this.keys["ArrowLeft"] && !this.attacking) {
+        if (this.keys["KeyN"] && !this.attacking) {
             this.moving = false;
             this.idle = false;
             this.dodging = false;
@@ -158,7 +160,7 @@ export default class Player {
 
         // can only dodgeroll when player presses (direction key + dodgeroll key)
         // this prevents rolling in place for infinite dodgerolls
-        if ((this.keys["ArrowRight"] && this.keys["KeyD"] || (this.keys["ArrowRight"] && this.keys["KeyA"]) ) &&
+        if ((this.keys["KeyM"] && this.keys["KeyD"] || (this.keys["KeyM"] && this.keys["KeyA"]) ) &&
          (this.x < 670) && (this.x > -70) && this.canDodge && !this.attacking) {
             // console.log(this.frameIdx)
             setTimeout(() => {
@@ -208,7 +210,7 @@ export default class Player {
             this.frameY = framesArr[this.actionIndices["dyingIdx"]][1];
             this.actionIndices["dyingIdx"]++;
         } else {
-            console.log("dying")
+            // console.log("dying")
             const that = this;
             setTimeout(function () {
                 that.alive = false;
