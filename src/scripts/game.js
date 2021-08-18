@@ -64,7 +64,7 @@ export default class Game {
     }
 
     setState() {
-        if (this.keys["KeyP"]) { // pausing game
+        if (this.keys["KeyK"]) { // pausing game
             this.togglePause();
         }
         if (this.keys["KeyR"]) { // restart game
@@ -91,27 +91,25 @@ export default class Game {
 
     titleScreen() {
         this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
-        // this.ctx.fillStyle = "rgba(0,0,0,0.5)";
+        this.ctx.fillStyle = "black";
         this.ctx.fill();
-        this.ctx.font = "50px Papyrus";
-        // this.ctx.fillStyle = "red";
-        this.ctx.fillStyle = 'red';
-        this.ctx.strokeStyle = 'red';
+        this.ctx.font = "10px Papyrus";
+        this.ctx.fillStyle = 'white';
         this.ctx.textAlign = 'start';
-        // this.ctx.fillText('Press "enter" to start', 150, this.dimensions.height / 2);
+        this.ctx.fillText('Press "enter" to start', 340, this.dimensions.height / 2);
     }
 
     pauseScreen() {
         this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
         this.ctx.fillStyle = "rgba(0,0,0,0.5)";
         this.ctx.fill();
-        this.ctx.font = "100px Papyrus";
+        this.ctx.font = "50px Papyrus";
         // this.ctx.fillStyle = "red";
         this.ctx.fillStyle = 'black';
         this.ctx.strokeStyle = 'red';
         this.ctx.textAlign = "center";
-        this.ctx.fillText('Coward.', this.dimensions.width / 2, this.dimensions.height / 2);
-        this.ctx.strokeText('Coward.', this.dimensions.width / 2, this.dimensions.height / 2);
+        this.ctx.fillText('paused', this.dimensions.width / 2, this.dimensions.height / 2);
+        this.ctx.strokeText('paused', this.dimensions.width / 2, this.dimensions.height / 2);
     }
 
     gameOverScreen() {
@@ -119,7 +117,7 @@ export default class Game {
             this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
             this.ctx.fillStyle = "rgba(0,0,0,0.5)";
             this.ctx.fill();
-            this.ctx.font = "100px Papyrus";
+            this.ctx.font = "50px Papyrus";
             // this.ctx.fillStyle = "red";
             this.ctx.fillStyle = 'black';
             this.ctx.strokeStyle = 'red';
