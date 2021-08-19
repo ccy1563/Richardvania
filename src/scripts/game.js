@@ -191,7 +191,7 @@ export default class Game {
         if (this.collision(this.player, this.rogue, 0, 0)) {
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.rogue.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.rogue.x < this.player.x)) {
-                this.rogue.beingAttacked(40);
+                this.rogue.beingAttacked(30);
             }
         }
         if (this.rogue.shurikenArr.length > 0) {
