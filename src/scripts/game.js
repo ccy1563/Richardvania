@@ -3,6 +3,7 @@ import Level from "../scripts/level.js";
 import Demon from "../scripts/demon.js";
 import Rogue from "../scripts/rogue.js";
 import Shuriken from "../scripts/shuriken";
+
 // import Utility from "../scripts/utility.js";
 
 export default class Game {
@@ -89,22 +90,11 @@ export default class Game {
         }
     }
 
-    titleScreen() {
-        this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
-        this.ctx.fillStyle = "black";
-        this.ctx.fill();
-        this.ctx.font = "10px Papyrus";
-        this.ctx.fillStyle = 'white';
-        this.ctx.textAlign = 'start';
-        this.ctx.fillText('Press "enter" to start', 340, this.dimensions.height / 2);
-    }
-
     pauseScreen() {
         this.ctx.rect(0, 0, this.dimensions.width, this.dimensions.height)
         this.ctx.fillStyle = "rgba(0,0,0,0.5)";
         this.ctx.fill();
         this.ctx.font = "50px Papyrus";
-        // this.ctx.fillStyle = "red";
         this.ctx.fillStyle = 'black';
         this.ctx.strokeStyle = 'red';
         this.ctx.textAlign = "center";
@@ -118,10 +108,9 @@ export default class Game {
             this.ctx.fillStyle = "rgba(0,0,0,0.5)";
             this.ctx.fill();
             this.ctx.font = "50px Papyrus";
-            // this.ctx.fillStyle = "red";
             this.ctx.fillStyle = 'black';
-            this.ctx.strokeStyle = 'red';
-            this.ctx.textAlign = "center";
+            this.ctx.strokeStyle = 'red'; // for outline
+            // this.ctx.textAlign = "center";
             this.ctx.fillText('F.', this.dimensions.width / 2, this.dimensions.height / 2);
             this.ctx.strokeText('F.', this.dimensions.width / 2, this.dimensions.height / 2);
 
@@ -137,8 +126,8 @@ export default class Game {
     
     animate() {
         if (this.gameState === this.menu) {
-            this.titleScreen();
-            return
+            requestAnimationFrame(this.animate.bind(this));
+            this.level.animateTitle(this.ctx, this.canvas);
         }
         // checking to see if the game is paused
         if (this.gameState === this.paused) {
@@ -150,17 +139,19 @@ export default class Game {
             this.gameOverScreen();
             return;
         }       
-        requestAnimationFrame(this.animate.bind(this));
-        this.now = Date.now();
-        this.elapsed = this.now - this.then;
-        if (this.elapsed > this.fpsInterval) {
-            this.then = this.now - (this.elapsed % this.fpsInterval);
-            this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
-            this.level.animate(this.ctx, this.canvas);
-            this.player.animate();
-            if (this.demon.alive) this.demon.animate(this.ctx, this.player.coordinates());
-            if (this.rogue.alive) this.rogue.animate(this.ctx, this.player.coordinates());
-            this.registerAttacks1();
+        if (this.gameState === this.running) {
+            requestAnimationFrame(this.animate.bind(this));
+            this.now = Date.now();
+            this.elapsed = this.now - this.then;
+            if (this.elapsed > this.fpsInterval) {
+                this.then = this.now - (this.elapsed % this.fpsInterval);
+                this.ctx.clearRect(0, 0, this.dimensions.width, this.dimensions.height);
+                this.level.animate(this.ctx, this.canvas);
+                this.player.animate();
+                if (this.demon.alive) this.demon.animate(this.ctx, this.player.coordinates());
+                if (this.rogue.alive) this.rogue.animate(this.ctx, this.player.coordinates());
+                this.registerAttacks1();
+            }
         }
     }
 
@@ -200,13 +191,12 @@ export default class Game {
         if (this.collision(this.player, this.rogue, 0, 0)) {
             // player attacking demon
             if ((this.player.attacking && this.player.direction === "right" && this.rogue.x + 30 > this.player.x) || (this.player.attacking && this.player.direction === "left" && this.rogue.x < this.player.x)) {
-                this.rogue.beingAttacked(10);
+                this.rogue.beingAttacked(40);
             }
         }
         if (this.rogue.shurikenArr.length > 0) {
             if (this.collision(this.player, this.rogue.shurikenArr[0], 0, 0)) {
                 if (this.rogue.alive && !this.rogue.dying) {
-                    console.log("shuriken attking player")
                     this.player.beingAttacked(2);
                 }
             }
