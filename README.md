@@ -1,4 +1,4 @@
-# Edgelord
+# Richardvania
 
 ## Background
 * RICHARD is a game where the player controls a character that can move left, right, and attack.
