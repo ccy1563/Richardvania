@@ -16,7 +16,7 @@
 <body>
     <img src="src/assets/Richardvania.png" class="title">
     <canvas id="canvas1"></canvas>
-    <div class="instructions">
+    <!-- <div class="instructions">
         <ul>
             <li>Press R if frames stutter.</li>
             <br>
@@ -29,17 +29,23 @@
             <li> R: refresh</li>
             <li> K: pause</li>
         </ul>
-    </div>
+    </div> -->
     <!-- <div class = "social">
         <a href=""><img src="src/assets/linkedin.png" width="50px" height="50px"></a>
         <br>
         <a href="https://github.com/ccy1563"><img src="src/assets/github.png" width="50px" height="50px"></a>
     </div> -->
 
-    <a href="#instruction-open-modal">Instructions</a>
+
+    <div class='modals'>
+        <button class="modal-button"><a class='links' href="#instruction-open-modal">Instructions</a></button>
+        <button class="modal-button"><a class='links' href="#social-open-modal">Socials</a></button>
+    </div>
+
+
     <div id="instruction-open-modal" class="modal-window">
         <div>
-            <a href="#modal-close" title="Close" class="modal-close">close &times;</a>
+            <a href="#modal-close" title="Close" class="modal-close">&times;</a>
             <ul>
                 <li>Press R if frames stutter.</li>
                 <br>
@@ -55,10 +61,9 @@
         </div>
     </div>
 
-    <a href="#social-open-modal">Socials</a>
     <div id="social-open-modal" class="modal-window">
         <div>
-            <a href="#modal-close" title="Close" class="modal-close">close &times;</a>
+            <a href="#modal-close" title="Close" class="modal-close">&times;</a>
             <a href="https://www.linkedin.com/in/chris-c-160950221"><img src="src/assets/linkedin.png" width="50px" height="50px"></a>
             <br>
             <a href="https://github.com/ccy1563"><img src="src/assets/github.png" width="50px" height="50px"></a>
