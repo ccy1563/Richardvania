@@ -148,3 +148,29 @@ body {
   background-color: rgba(196, 0, 170, 0.5);
   border-radius: 40px;
 }
+
+.linkedin {
+  display: flex;
+}
+
+.linkedin-desc {
+  padding: 20px 200px 0 10px;
+}
+
+.linkedin-desc-link {
+  text-decoration: none;
+  color: black;
+}
+
+.github {
+  display: flex;
+}
+
+.github-desc {
+  padding: 20px 220px 0 10px;
+}
+
+.github-desc-link {
+  text-decoration: none;
+  color: black;
+}
