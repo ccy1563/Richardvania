@@ -5,7 +5,7 @@
 * The goal is to reach the end of the level while eliminating as many enemies as possible.
 * You play as a swordsman Old Richard that was imprisoned by Demon Lord Anthony. After a decade of imprisonment, Old Richard escaped and now his sole mission is to slay Anthony with his big sword.
 
-![Alt Text](https://github.com/ccy1563/Richardvania/blob/main/richardvania.gif)
+                     ![Alt Text](https://github.com/ccy1563/Richardvania/blob/main/richardvania.gif)
 
 ## Functionality & MVPs
 INSTRUCTIONS
