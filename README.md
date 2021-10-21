@@ -1,6 +1,6 @@
 # [Richardvania](https://ccy1563.github.io/Richardvania/)
 
-# [Richardvania](https://github.com/ccy1563/Richardvania/blob/main/richardvania.gif)
+![Alt Text](https://github.com/ccy1563/Richardvania/blob/main/richardvania.gif)
 
 ## Background
 * RICHARDVANIA is a game where the player controls a character that can move left, right, and attack.
