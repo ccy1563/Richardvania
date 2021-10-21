@@ -1,4 +1,4 @@
-# Richardvania
+# [Richardvania](https://ccy1563.github.io/Richardvania/)
 
 ## Background
 * RICHARDVANIA is a game where the player controls a character that can move left, right, and attack.
