@@ -1,7 +1,7 @@
-# Richardvania
+# [Richardvania](https://ccy1563.github.io/Richardvania/)
 
 ## Background
-* RICHARD is a game where the player controls a character that can move left, right, and attack.
+* RICHARDVANIA is a game where the player controls a character that can move left, right, and attack.
 * The goal is to reach the end of the level while eliminating as many enemies as possible.
 * You play as a swordsman Old Richard that was imprisoned by Demon Lord Anthony. After a decade of imprisonment, Old Richard escaped and now his sole mission is to slay Anthony with his big sword.
 
