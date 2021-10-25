@@ -35,9 +35,12 @@ This project will be implemented with the following technologies:
 * Canvas API
 
 ## Code Snippet
+<img align="center" width="500" height="300" src="https://github.com/ccy1563/Richardvania/blob/main/teleport.gif">
+
 * When the Rogue enemy type gets hit by the player, she must go through two phases of animation
   1. Teleport straight up, fading out, and then Rogue location is shifted over to the opposite side of the screen
   2. Teleport straight down, fading back in
+
 ```Javascript
     handleTeleportFramesPhase1() {
         let framesArr = this.teleportFramesLPhase1;
