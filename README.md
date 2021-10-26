@@ -1,6 +1,6 @@
 # [Richardvania](https://ccy1563.github.io/Richardvania/)
 
-# [Richardvania](https://github.com/ccy1563/Richardvania/blob/main/richardvania.gif)
+<img align="center" width="500" height="300" src="https://github.com/ccy1563/Richardvania/blob/main/richardvania.gif">
 
 ## Background
 * RICHARDVANIA is a game where the player controls a character that can move left, right, and attack.
@@ -33,6 +33,52 @@ This project will be implemented with the following technologies:
 * Javascript
 * CSS
 * Canvas API
+
+## Code Snippet
+<img align="center" width="500" height="300" src="https://github.com/ccy1563/Richardvania/blob/main/teleport.gif">
+
+* When the Rogue enemy type gets hit by the player, she must go through two phases of animation
+  1. Teleport straight up, fading out, and then Rogue location is shifted over to the opposite side of the screen
+  2. Teleport straight down, fading back in
+
+```Javascript
+    handleTeleportFramesPhase1() {
+        let framesArr = this.teleportFramesLPhase1;
+        if (this.direction === "right") framesArr = this.teleportFramesRPhase1;
+        if (this.actionIndices["teleportIdx"] < framesArr.length) {
+            this.frameX = framesArr[this.actionIndices["teleportIdx"]][0];
+            this.frameY = framesArr[this.actionIndices["teleportIdx"]][1];
+            this.actionIndices["teleportIdx"]++;
+        } else {
+            const that = this;
+            this.frameX = framesArr[framesArr.length - 1][0];
+            this.frameY = framesArr[framesArr.length - 1][1];
+            if (that.direction === "left") {
+                that.x = -50;
+            } else {
+                that.x = 690;
+            }
+            that.teleport1 = false;
+            that.teleport2 = true;
+            that.actionIndices["teleportIdx"] = 0;
+        }
+    }
+
+    handleTeleportFramesPhase2() {
+        let framesArr = this.teleportFramesLPhase2;
+        if (this.direction === "right") framesArr = this.teleportFramesRPhase2;
+        if (this.actionIndices["teleportIdx"] < framesArr.length) {
+            this.frameX = framesArr[this.actionIndices["teleportIdx"]][0];
+            this.frameY = framesArr[this.actionIndices["teleportIdx"]][1];
+            this.actionIndices["teleportIdx"]++;
+        } else {
+            this.invincible = false;
+            this.teleport2 = false;
+            this.attack = false;
+            this.actionIndices["teleportIdx"] = 0;
+        }
+    }
+```
 
 ## Implementation Timeline
 * Friday Afternoon & Weekend\
