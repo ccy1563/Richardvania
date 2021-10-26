@@ -1,5 +1,7 @@
 # [Richardvania](https://ccy1563.github.io/Richardvania/)
 
+# [Richardvania](https://github.com/ccy1563/Richardvania/blob/main/richardvania.gif)
+
 ## Background
 * RICHARDVANIA is a game where the player controls a character that can move left, right, and attack.
 * The goal is to reach the end of the level while eliminating as many enemies as possible.
